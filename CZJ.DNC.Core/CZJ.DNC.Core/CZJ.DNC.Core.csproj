@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyVersion>1.4.1.0</AssemblyVersion>
+    <FileVersion>1.4.1.0</FileVersion>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Version>1.4.1</Version>
+    <Authors>焰尾迭</Authors>
+    <Description>基础依赖包，Autofac，AutoMapper</Description>
+    <Company>武汉中科通达高新技术股份有限公司</Company>
+    <PackageTags>微服务,Autofac,AutoMapper,HttpClient,ServiceDiscovery</PackageTags>
+    <PackageReleaseNotes>2018-04-20 修改程序集查找方式，包含从Nuget上下载的以Citms.开头的包
+2018-04-25 AutoMapper修改
+2018-05-07 添加EF拓展方法
+2018-05-31 添加动态代理规则
+2018-05-10 删除对win32库的依赖
+2018-05-18 修改ims菜单注册bug
+2018-06-10 解决HttpClient 直接使用.Result获取数据并发线程锁死问题
+2018-06-21 添加AsyncLock对象
+2018-06-29 修改FileHelper在linux下路径错误问题
+2018-07-13 更新依赖版本为.NETStandard
+2018-07-16 修复linux下获取本机IP异常问题
+2018-07-19 添加公共token获取接口，修复代理转发bug
+2018-08-01 添加Swagger自定义头属性
+2018-08-10 添加区域定义
+2018-09-10 添加一小时自动注册功能
+2018-09-12 添加AsyncHelper类
+2018-10-15 退出时从注册中心移除接口
+2018-10-30 调试模式添加 "needRegister": 1, //调试模式是否需要注册</PackageReleaseNotes>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.8.1" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.3.1" />
+    <PackageReference Include="AutoMapper" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Server.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Net.Http.Headers" Version="2.1.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.0.9" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>CZJ.DNC.SwaggerExtend</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>焰尾迭</Authors>
+    <Company>武汉中科通达高新技术股份有限公司</Company>
+    <PackageTags>Swagger</PackageTags>
+    <PackageReleaseNotes>2018-07-13 更新依赖版本为.NETStandard
+2018-08-01 添加自定义头属性CustomHeaderAttribute</PackageReleaseNotes>
+    <Description>Api接口说明Swagger拓展，包含AuthTokenHeader，文件上传组件</Description>
+    <Version>1.0.3</Version>
+    <FileVersion>1.0.3.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.Core.csproj" />
+  </ItemGroup>
+</Project>

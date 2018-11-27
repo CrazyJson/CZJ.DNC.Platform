@@ -1,0 +1,41 @@
+﻿服务初始化会读取该配置文件,
+如果同目录下存在Config_Local.config文件 则会以本地配置文件信息为主
+
+目的:解决多人开发时,对于配置个性化问题
+eg:开发A 数据库配置为 AA
+   开发B 数据库配置为 BB
+   原先逻辑这个时候只能修改Config.config里面的节点值了，而Config.config是受源代码管理的，修改后可能不小心就签入了，导致服务器
+   配置信息被修改。
+
+解决方案：本地添加Config_Local.config重新对该节点赋值
+
+
+2、自定义本地化配置
+
+业务参数配置参数存储在数据库，多个站点公用同一个数据库但是每个站点有些业务参数配置又不一样，这种情况多数发生在多个网络，设备网，公安网...
+
+解决方案：在本地Config_Local.config中添加以下节点
+
+
+  <!--自定义本地化业务参数配置-->
+  <CustomLocalParams>
+    <BusinessParams key="ImageZipConfig" desc="图片处理配置">
+      <param key="ImageHandleApi" desc="接口地址">http://192.168.0.245:8847/ThumImage?src=</param>
+    </BusinessParams>
+
+    <BusinessParams key="VideoQueryConfig" desc="视频服务配置">
+      <param key="VideoTransitAPI">http://192.168.0.245:8089</param>
+    </BusinessParams>
+
+    <BusinessParams key="MapConfig" desc="Gis地图服务配置">
+      <param key="tas">http://192.168.0.104:8083/tasxy/showAnalysis/realtime</param>
+      <param key="mapConfig">http://192.168.0.207/map/xiangyang/MapConfig.xml</param>
+	  <param key="PathRecord">http://61.183.197.2:6080/arcgis/rest/services/tianjin/PathRecord/FeatureServer/0</param>
+	  <param key="NAserver">http://192.168.0.201:6080/arcgis/rest/services/tianjin/NARoad/NAServer/Path</param>
+      <param key="tianjinplanning">http://192.168.0.201:6080/arcgis/rest/services/tianjin/tianjinplanning/MapServer</param>
+      <param key="baseMapAll">http://192.168.0.201:6080/arcgis/rest/services/tianjin/BaseMap_All/MapServer</param>
+	  <param key="AllRoad">http://61.183.197.2:6080/arcgis/rest/services/tianjin/AllRoad/FeatureServer/0</param>
+    </BusinessParams>
+  </CustomLocalParams>
+
+对需要做本地化配置的界面进行重新赋值，修改完后重启iis才能生效
