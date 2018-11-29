@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using CZJ.Common.Module;
+using CZJ.DNC.License;
+using System;
 
 namespace CZJ.DNC.Web.Module
 {
@@ -26,7 +28,6 @@ namespace CZJ.DNC.Web.Module
         /// <param name="loggerFactory"></param>
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-
 #if DEBUG
 #else
             string msg = LicenseHelper.Verify();

@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Citms.Comon.Web": {
+    "CZJ.DNC.Web": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

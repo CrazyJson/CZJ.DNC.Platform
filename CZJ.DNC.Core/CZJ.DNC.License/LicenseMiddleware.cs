@@ -10,7 +10,7 @@ using System.Net;
 using CZJ.Common.Serializer;
 using CZJ.Common;
 
-namespace Microsoft.AspNetCore.Proxy
+namespace CZJ.DNC.License
 {
     /// <summary>
     /// License授权 Middleware

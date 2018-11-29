@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <Description>中科Web站点容器</Description>
-    <Company>武汉中科通达高新技术股份有限公司</Company>
-    <Authors>中科通达</Authors>
+    <Description>Web站点容器</Description>
+    <Company></Company>
+    <Authors>焰尾迭</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/CrazyJson/CZJ.DNC.Platform.git</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -20,6 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.WindowsServices" Version="2.1.1" />
     <PackageReference Include="MySql.Data.EntityFrameworkCore" Version="8.0.13" />
     <PackageReference Include="Rabbit.Extensions.Configuration" Version="1.0.0-preview5" />
   </ItemGroup>
@@ -39,7 +41,13 @@
     <None Update="Config\配置规则说明.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="startup.bat">
+    <None Update="startup_console.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="startup_windowservice.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="stop_windowservice.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Template\Excel\设备批量注册.xls">

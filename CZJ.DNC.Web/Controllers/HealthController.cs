@@ -8,6 +8,7 @@ namespace CZJ.DNC.Web.Controllers
     /// 健康检测接口
     /// </summary>
     [AllowAnonymous]
+    [Route("api/[controller]")]
     public class HealthController : Controller
     {
         /// <summary>

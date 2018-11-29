@@ -35,7 +35,7 @@ namespace CZJ.Common.Module
             {
                 CitmsHttpRequest request = new CitmsHttpRequest
                 {
-                    AddressUrl = $"http://{appInfo.IpAddress}:{appInfo.Ports[0]}/api/Health/Check",
+                    AddressUrl = $"http://{appInfo.IpAddress}:{appInfo.Ports[0]}/api/Health",
                     ProxyRequest = false
                 };
                 int i = 0;
