@@ -9,6 +9,7 @@ using CZJ.DNC.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Hosting.WindowsServices;
+using System.Diagnostics;
 
 namespace CZJ.DNC.Web
 {
@@ -33,20 +34,13 @@ namespace CZJ.DNC.Web
             string serverUrls = config.GetValue<string>("server.urls");
             int port = GetPort(serverUrls);
             //window下程序参数中带有service=true表示以Windows服务运行方式
-            bool isService = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && args.Contains("service=true");
+            bool isService = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && 
+                !(args.Contains("console=true") || Debugger.IsAttached);
             if (!isService && HostHelper.IsPortInUsed(port))
             {
                 //如果站点端口已经被占用
                 Console.WriteLine("端口已被占用，将关闭之前已启动程序");
-                string url = $"http://127.0.0.1:{port}/api/App/Stop";
-                using (var httpclient = new HttpClient())
-                {
-                    HttpRequestMessage requestMessage = new HttpRequestMessage();
-                    requestMessage.RequestUri = new Uri(url);
-                    requestMessage.Method = HttpMethod.Head;
-                    requestMessage.Headers.TryAddWithoutValidation("Stop-Application", "yes");
-                    var t = httpclient.SendAsync(requestMessage).GetAwaiter().GetResult();
-                }
+                CloseApp(port);
             }
             var host = WebHost.CreateDefaultBuilder(args).UseKestrel()
                         .UseStartup<Startup>()
@@ -73,6 +67,23 @@ namespace CZJ.DNC.Web
             var arrUrl = serverUrls.Split(";");
             var url = new Uri(arrUrl[0].Replace("*", "127.0.0.1"));
             return url.Port;
+        }
+
+        /// <summary>
+        /// 关闭当前端口程序
+        /// </summary>
+        /// <param name="port"></param>
+        private static void CloseApp(int port)
+        {
+            string url = $"http://127.0.0.1:{port}/api/App/Stop";
+            using (var httpclient = new HttpClient())
+            {
+                HttpRequestMessage requestMessage = new HttpRequestMessage();
+                requestMessage.RequestUri = new Uri(url);
+                requestMessage.Method = HttpMethod.Head;
+                requestMessage.Headers.TryAddWithoutValidation("Stop-Application", "yes");
+                httpclient.SendAsync(requestMessage).GetAwaiter().GetResult();
+            }
         }
     }
 }

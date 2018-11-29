@@ -34,6 +34,7 @@
     <ProjectReference Include="..\CZJ.DNC.Core\CZJ.Discovery.Consul\CZJ.Discovery.Consul.csproj" />
     <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.Core\CZJ.DNC.Core.csproj" />
     <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.License\CZJ.DNC.License.csproj" />
+    <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.Log4net\CZJ.DNC.Log4net.csproj" />
     <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.Swagger\CZJ.DNC.Swagger.csproj" />
   </ItemGroup>
 

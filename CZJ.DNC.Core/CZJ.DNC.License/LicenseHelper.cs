@@ -14,13 +14,13 @@ namespace CZJ.DNC.License
     {
         private static string path = FileHelper.GetAbsolutePath("license.lic");
 
-        private static string NO_LICENSE_FILE = "没有检测到License授权文件。请使用机器码：{0}联系管理员获取授权文件！";
+        private static string NO_LICENSE_FILE = "没有检测到License授权文件。请使用机器码：{0} 联系管理员获取授权文件！";
 
-        private static string ERROR_LICENSE = "License信息错误。请使用机器码：{0}联系管理员重新获取授权文件！";
+        private static string ERROR_LICENSE = "License信息错误。请使用机器码：{0} 联系管理员重新获取授权文件！";
 
-        private static string Machine_NO_MATCH = "授权文件的注册机器与本机不一致。请使用机器码：{0}联系管理员重新获取授权文件！";
+        private static string Machine_NO_MATCH = "授权文件的注册机器与本机不一致。请使用机器码：{0} 联系管理员重新获取授权文件！";
 
-        private static string SOFTWARE_TRIAL_EXPIRED = "软件试用已到期，请使用机器码：{0}联系管理员重新获取授权文件！";
+        private static string SOFTWARE_TRIAL_EXPIRED = "软件试用已到期，请使用机器码：{0} 联系管理员重新获取授权文件！";
 
         private static readonly CustomMD5 customMD5 = CustomMD5.MD5;
 

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using CZJ.Common.Module;
 using CZJ.DNC.License;
 using System;
+using CZJ.Dependency;
 
 namespace CZJ.DNC.Web.Module
 {

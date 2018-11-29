@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>焰尾迭</Authors>
+    <Product>武汉中科通达高新技术股份有限公司</Product>
+    <Copyright>武汉中科通达高新技术股份有限公司</Copyright>
+    <Description>dotnet core下Log4Net日志记录封装</Description>
+    <PackageTags>Log4Net</PackageTags>
+    <AssemblyVersion>1.0.2.0</AssemblyVersion>
+    <FileVersion>1.0.2.0</FileVersion>
+    <Version>1.0.2</Version>
+    <PackageReleaseNotes>2018-07-13 更新依赖版本为.NETStandard</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.Core.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

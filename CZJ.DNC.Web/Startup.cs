@@ -9,9 +9,10 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using System.Collections.Generic;
 using Rabbit.Extensions.Configuration;
+using Autofac;
 using Microsoft.AspNetCore.Http;
-using CZJ.Common.Module;
 using CZJ.Common.Core;
+using CZJ.Common.Module;
 using CZJ.Reflection;
 using CZJ.Dependency;
 
@@ -25,7 +26,7 @@ namespace CZJ.DNC.Web
         /// <summary>
         /// 配置
         /// </summary>
-        public IConfiguration Configuration { get; }
+        private IConfiguration configuration { get; }
 
         private List<IServiceModule> configModules = new List<IServiceModule>();
 
@@ -36,13 +37,13 @@ namespace CZJ.DNC.Web
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
+                .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
-            Configuration = builder.Build().EnableTemplateSupport();
-            Configuration.GetReloadToken().RegisterChangeCallback(OnSettingChanged, Configuration);
-            ConfigInit.InitConfig(Configuration);
+            configuration = builder.Build().EnableTemplateSupport();
+            configuration.GetReloadToken().RegisterChangeCallback(OnSettingChanged, configuration);
+            ConfigInit.InitConfig(configuration);
         }
         /// <summary>
         /// 配置文件改变
@@ -50,8 +51,7 @@ namespace CZJ.DNC.Web
         /// <param name="state"></param>
         private void OnSettingChanged(object state)
         {
-            IConfiguration configuration = (IConfiguration)state;
-            ConfigInit.InitConfig(configuration);
+            ConfigInit.InitConfig(state as IConfiguration);
         }
         /// <summary>
         /// This method gets called by the runtime. Use this method to add services to the container.
@@ -60,7 +60,7 @@ namespace CZJ.DNC.Web
         /// <returns></returns>
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton(Configuration);
+            services.AddSingleton(configuration);
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             //替换IOC插件为Autofac
             services.Replace(ServiceDescriptor.Transient<IControllerActivator, ServiceBasedControllerActivator>());
@@ -72,8 +72,9 @@ namespace CZJ.DNC.Web
             }
             foreach (var module in configModules)
             {
-                module.ConfigureServices(services, Configuration);
+                module.ConfigureServices(services, configuration);
             }
+            services.RemoveAll<ILoggerProvider>();
             return IocManager.Instance.Initialize(services);
         }
 
@@ -96,7 +97,7 @@ namespace CZJ.DNC.Web
             foreach (var module in configModules.OrderBy(e => e.Order))
             {
                 module.Configure(app, env, loggerFactory);
-            }       
+            }
         }
     }
 }
