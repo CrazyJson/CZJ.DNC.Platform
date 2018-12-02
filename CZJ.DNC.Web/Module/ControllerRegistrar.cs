@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Autofac.Extras.DynamicProxy;
 using CZJ.Dependency;
 using CZJ.Reflection;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +33,7 @@ namespace Citms.Common.MVC
             //注册Controller,实现属性注入
             var IControllerType = typeof(ControllerBase);
             var arrControllerType = typeFinder.FindAll().Where(t => IControllerType.IsAssignableFrom(t) && t != IControllerType).ToArray();
-            builder.RegisterTypes(arrControllerType).PropertiesAutowired();
+            builder.RegisterTypes(arrControllerType).PropertiesAutowired().EnableClassInterceptors();
         }
     }
 }

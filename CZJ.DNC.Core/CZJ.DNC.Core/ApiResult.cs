@@ -188,7 +188,7 @@ namespace CZJ.Common
         /// <summary>
         /// 数据总条数
         /// </summary>
-        public int? TotalCount { get; set; }
+        public int? Total { get; set; }
 
         public ApiResult()
         {

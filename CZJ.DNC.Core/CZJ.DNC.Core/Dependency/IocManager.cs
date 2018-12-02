@@ -2,6 +2,7 @@
 using Autofac.Core;
 using Autofac.Core.Lifetime;
 using Autofac.Extensions.DependencyInjection;
+using Autofac.Extras.DynamicProxy;
 using CZJ.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -59,7 +60,7 @@ namespace CZJ.Dependency
                 .AsSelf()
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope()
-                .PropertiesAutowired();
+                .PropertiesAutowired().EnableInterfaceInterceptors();
 
             foreach (Type type in arrDependencyType)
             {
