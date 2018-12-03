@@ -50,4 +50,7 @@
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CZJ.DNC.Hystrix\CZJ.DNC.Hystrix.csproj" />
+  </ItemGroup>
 </Project>

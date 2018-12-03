@@ -3,11 +3,13 @@ using Autofac.Core;
 using Autofac.Core.Lifetime;
 using Autofac.Extensions.DependencyInjection;
 using Autofac.Extras.DynamicProxy;
+using CZJ.DNC.Hystrix;
 using CZJ.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace CZJ.Dependency
 {
@@ -88,10 +90,17 @@ namespace CZJ.Dependency
                 {
                     builder.RegisterType(type).As(type.BaseType)
                         .SingleInstance()
-                        .PropertiesAutowired();
+                        .PropertiesAutowired().EnableInterceptors;
                 }
             }
 
+            var tpyes = listAllType.Where(t => t.GetMethods().Any(e => e.GetCustomAttribute<HystrixCommandAttribute>() != null)).ToArray();
+
+            builder.RegisterBuildCallback((container) =>
+            {
+
+            });
+            var x = builder.Properties;
             builder.Populate(services);
             _container = builder.Build();
             return new AutofacServiceProvider(_container);

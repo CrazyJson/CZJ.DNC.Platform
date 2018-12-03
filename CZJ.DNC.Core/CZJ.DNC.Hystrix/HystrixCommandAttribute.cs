@@ -1,5 +1,4 @@
-﻿using Autofac.Extras.DynamicProxy;
-using System;
+﻿using System;
 
 namespace CZJ.DNC.Hystrix
 {
@@ -7,10 +6,15 @@ namespace CZJ.DNC.Hystrix
     /// 熔断降级自定义属性
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class HystrixCommandAttribute : InterceptAttribute
+    public class HystrixCommandAttribute : Attribute
     {
-        public HystrixCommandAttribute() : base(typeof(HystrixInterceptor))
+        /// <summary>
+        /// HystrixCommandAttribute
+        /// </summary>
+        /// <param name="fallBackMethod">降级的方法名</param>
+        public HystrixCommandAttribute(string fallBackMethod)
         {
+            FallBackMethod = fallBackMethod;
         }
 
         /// <summary>
