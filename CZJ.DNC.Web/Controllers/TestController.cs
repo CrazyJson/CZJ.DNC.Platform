@@ -55,7 +55,7 @@ namespace CZJ.DNC.Web.Controllers
         [HystrixCommand(nameof(FallBackMethod),
 IsEnableCircuitBreaker = true,
 ExceptionsAllowedBeforeBreaking = 3,
-MillisecondsOfBreak = 1000 * 10, MaxRetryTimes = 10, CacheTTLMilliseconds = 10 * 1000)]
+MillisecondsOfBreak = 1000 * 10, CacheTTLMilliseconds = 10 * 1000)]
         public string Say()
         {
             i++;

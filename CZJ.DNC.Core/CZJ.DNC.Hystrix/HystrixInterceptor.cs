@@ -63,7 +63,7 @@ namespace CZJ.DNC.Hystrix
                               //还是第一次的对象，所以要通过Polly的上下文来传递AspectContext
                               //context.ReturnValue = fallBackResult;
                               invocationContext.ReturnValue = fallBackResult;
-                          }, (ex, t) => { throw ex; });
+                          }, (ex, t) => {  });
                         policy = policyFallBack.Wrap(policy);
                         //放入
                         policies.TryAdd(invocation.MethodInvocationTarget, policy);

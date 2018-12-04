@@ -1,8 +1,6 @@
 ﻿using Autofac.Builder;
 using Autofac.Features.Scanning;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CZJ.Dependency
 {
