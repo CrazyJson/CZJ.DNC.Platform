@@ -34,7 +34,7 @@ namespace CZJ.DNC.Web
             string serverUrls = config.GetValue<string>("server.urls");
             int port = GetPort(serverUrls);
             //window下程序参数中带有service=true表示以Windows服务运行方式
-            bool isService = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && 
+            bool isService = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) &&
                 !(args.Contains("console=true") || Debugger.IsAttached);
             if (!isService && HostHelper.IsPortInUsed(port))
             {
@@ -82,7 +82,14 @@ namespace CZJ.DNC.Web
                 requestMessage.RequestUri = new Uri(url);
                 requestMessage.Method = HttpMethod.Head;
                 requestMessage.Headers.TryAddWithoutValidation("Stop-Application", "yes");
-                httpclient.SendAsync(requestMessage).GetAwaiter().GetResult();
+                try
+                {
+                    httpclient.SendAsync(requestMessage).GetAwaiter().GetResult();
+                }
+                catch (Exception e)
+                {
+
+                }
             }
         }
     }

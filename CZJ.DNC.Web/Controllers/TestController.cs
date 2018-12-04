@@ -4,6 +4,7 @@ using CZJ.Common;
 using CZJ.DNC.Hystrix;
 using System;
 using System.Threading.Tasks;
+using CZJ.Dependency;
 
 namespace CZJ.DNC.Web.Controllers
 {
@@ -44,7 +45,7 @@ namespace CZJ.DNC.Web.Controllers
     /// <summary>
     /// 
     /// </summary>
-    public class TestService : ITestService
+    public class TestService : ITestService, ITransientDependency
     {
         private static int i = 0;
         /// <summary>

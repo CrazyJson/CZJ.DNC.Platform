@@ -34,6 +34,10 @@ namespace CZJ.Discovery.Consul
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             needRegister = (env.IsDevelopment() && needRegister) || !env.IsDevelopment();
+            if (!needRegister)
+            {
+                return;
+            }
             //请求注册的 Consul 地址
             var consulClient = new ConsulClient(x => x.Address = new Uri($"http://{consulIP}:{consulPort}"));
             var appInfo = app.ApplicationServices.GetRequiredService<IAppInfoProvider>();
@@ -56,8 +60,16 @@ namespace CZJ.Discovery.Consul
                 Port = Convert.ToInt32(appInfo.Ports[0]),
                 Tags = SysConfig.MicroServiceOption.Tags
             };
-
-            consulClient.Agent.ServiceRegister(registration).Wait();//服务启动时注册，内部实现其实就是使用 Consul API 进行注册（HttpClient发起）
+            try
+            {
+                //服务启动时注册，内部实现其实就是使用 Consul API 进行注册（HttpClient发起）
+                consulClient.Agent.ServiceRegister(registration).Wait();
+            }
+            catch (Exception e)
+            {
+                var logger = loggerFactory.CreateLogger<ConsulRegister>();
+                logger.LogError(e, $"向consul【{consulClient.Config.Address}】注册失败！");
+            }
             lifetime.ApplicationStopping.Register(() =>
             {
                 consulClient.Agent.ServiceDeregister(registration.ID).Wait();//服务停止时取消注册

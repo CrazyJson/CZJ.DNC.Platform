@@ -1,15 +1,15 @@
 ﻿using Autofac;
+using Autofac.Builder;
 using Autofac.Core;
 using Autofac.Core.Lifetime;
 using Autofac.Extensions.DependencyInjection;
 using Autofac.Extras.DynamicProxy;
-using CZJ.DNC.Hystrix;
+using Autofac.Features.Scanning;
 using CZJ.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace CZJ.Dependency
 {
@@ -20,8 +20,7 @@ namespace CZJ.Dependency
     {
         private IContainer _container;
 
-        public static IocManager Instance { get { return SingletonInstance; } }
-        private static readonly IocManager SingletonInstance = new IocManager();
+        public static IocManager Instance { get; } = new IocManager();
 
         /// <summary>
         /// Ioc容器初始化
@@ -55,55 +54,74 @@ namespace CZJ.Dependency
             {
                 dependencyRegistrar.Register(builder, typeFinder);
             }
+
+            var arrAfterRegistrarType = listAllType.Where(t => typeof(IAfterRegister).IsAssignableFrom(t)
+                && t != typeof(IAfterRegister)).ToArray();
+            List<IAfterRegister> afterRegisters = new List<IAfterRegister>();
+            foreach (var item in arrAfterRegistrarType)
+            {
+                afterRegisters.Add((IAfterRegister)Activator.CreateInstance(item));
+            }
+
             //注册ITransientDependency实现类
             var dependencyType = typeof(ITransientDependency);
-            var arrDependencyType = listAllType.Where(t => dependencyType.IsAssignableFrom(t) && t != dependencyType).ToArray();
-            builder.RegisterTypes(arrDependencyType)
-                .AsSelf()
-                .AsImplementedInterfaces()
-                .InstancePerLifetimeScope()
-                .PropertiesAutowired().EnableInterfaceInterceptors();
-
-            foreach (Type type in arrDependencyType)
-            {
-                if (type.IsClass && !type.IsAbstract && !type.BaseType.IsInterface && type.BaseType != typeof(object))
-                {
-                    builder.RegisterType(type).As(type.BaseType)
-                        .InstancePerLifetimeScope()
-                        .PropertiesAutowired();
-                }
-            }
-
-
             //注册ISingletonDependency实现类
             var singletonDependencyType = typeof(ISingletonDependency);
-            var arrSingletonDependencyType = listAllType.Where(t => singletonDependencyType.IsAssignableFrom(t) && t != singletonDependencyType).ToArray();
-            builder.RegisterTypes(arrSingletonDependencyType)
-                .AsSelf()
-                .AsImplementedInterfaces()
-                .SingleInstance()
-                .PropertiesAutowired();
-
-            foreach (Type type in arrSingletonDependencyType)
+            bool bClassRegister = false, bISingletonRegister = false, bTransientRegister = false;
+            IRegistrationBuilder<object, ScanningActivatorData, DynamicRegistrationStyle> builderRegister = null;
+            foreach (var type in listAllType)
             {
-                if (type.IsClass && !type.IsAbstract && !type.BaseType.IsInterface && type.BaseType != typeof(object))
+                bTransientRegister = dependencyType.IsAssignableFrom(type) && type != dependencyType;
+                bISingletonRegister = singletonDependencyType.IsAssignableFrom(type) && type != singletonDependencyType;
+                if (!bTransientRegister && !bISingletonRegister)
                 {
-                    builder.RegisterType(type).As(type.BaseType)
-                        .SingleInstance()
-                        .PropertiesAutowired().EnableInterceptors;
+                    continue;
                 }
+                bClassRegister = type.IsClass && !type.IsAbstract && !type.BaseType.IsInterface && type.BaseType != typeof(object);
+                builderRegister = builder.RegisterTypes(type);
+                if (!bClassRegister)
+                {
+                    builderRegister = builderRegister.AsImplementedInterfaces();
+                }
+                else
+                {
+                    builderRegister = builderRegister.As(type.BaseType);
+                }
+                if (bTransientRegister)
+                {
+                    builderRegister = builderRegister.InstancePerLifetimeScope();
+                }
+                else
+                {
+                    builderRegister = builderRegister.SingleInstance();
+                }
+                builderRegister = builderRegister.PropertiesAutowired();
+                if (afterRegisters.Count > 0)
+                {
+                    builderRegister = AfterRegister(builderRegister, afterRegisters, type, bClassRegister);
+                }  
             }
-
-            var tpyes = listAllType.Where(t => t.GetMethods().Any(e => e.GetCustomAttribute<HystrixCommandAttribute>() != null)).ToArray();
-
-            builder.RegisterBuildCallback((container) =>
-            {
-
-            });
-            var x = builder.Properties;
             builder.Populate(services);
             _container = builder.Build();
             return new AutofacServiceProvider(_container);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="builderRegister"></param>
+        /// <param name="afterRegisters"></param>
+        /// <param name="type"></param>
+        /// <param name="bClassRegister"></param>
+        /// <returns></returns>
+        private IRegistrationBuilder<object, ScanningActivatorData, DynamicRegistrationStyle> AfterRegister(IRegistrationBuilder<object, ScanningActivatorData, DynamicRegistrationStyle> builderRegister
+            , List<IAfterRegister> afterRegisters, Type type, bool bClassRegister)
+        {
+            foreach (var item in afterRegisters)
+            {
+                builderRegister = item.Register(builderRegister, type, bClassRegister);
+            }
+            return builderRegister;
         }
 
         /// <summary>
