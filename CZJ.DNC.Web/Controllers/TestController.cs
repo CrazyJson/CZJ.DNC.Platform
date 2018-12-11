@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using CZJ.Common;
-using CZJ.DNC.Hystrix;
 using System;
-using System.Threading.Tasks;
 using CZJ.Dependency;
+using CZJ.Common;
+using System.Text;
+using System.IO;
+using CZJ.DNC.Hystrix;
+using CZJ.DNC.Web.Sample;
+using System.Threading.Tasks;
 
 namespace CZJ.DNC.Web.Controllers
 {
@@ -19,16 +22,48 @@ namespace CZJ.DNC.Web.Controllers
         /// 
         /// </summary>
         public ITestService testService { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IPaymentWebApi paymentWebApi { get; set; }
+
         /// <summary>
         /// 检测程序Http服务是否正常
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public string Get()
+        public async Task<string> Get()
         {
+            var p = await paymentWebApi.GetPaymentHistoryByAccountAsync("my name is ");
             return testService.Say();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="files"></param>
+        [HttpPost]
+        [Route("[action]")]
+        public string Upload(SwaggerFile files)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat("共接收到{0}文件", Request.Form.Files.Count);
+            sb.AppendLine();
+            foreach (var file in Request.Form.Files)
+            {
+                using (FileStream fs = new FileStream($@"C:\Users\ANGLE\Pictures\Screenshots\Temp\{file.FileName}", FileMode.Create))
+                {
+                    file.CopyTo(fs);
+                }
+                sb.AppendFormat("ContentDisposition:{0},ContentType:{1},FileName:{2},Name:{3}", file.ContentDisposition, file.ContentType, file.FileName, file.Name);
+                sb.AppendLine();
+            }
+            return sb.ToString();
+        }
     }
+
+
 
     /// <summary>
     /// 

@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Hosting.WindowsServices" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.WindowsServices" Version="2.2.0" />
     <PackageReference Include="MySql.Data.EntityFrameworkCore" Version="8.0.13" />
     <PackageReference Include="Rabbit.Extensions.Configuration" Version="1.0.0-preview5" />
   </ItemGroup>
@@ -33,6 +33,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CZJ.DNC.Core\CZJ.Discovery.Consul\CZJ.Discovery.Consul.csproj" />
     <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.Core\CZJ.DNC.Core.csproj" />
+    <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.Feign\CZJ.DNC.Feign.csproj" />
     <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.Hystrix\CZJ.DNC.Hystrix.csproj" />
     <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.License\CZJ.DNC.License.csproj" />
     <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.Log4net\CZJ.DNC.Log4net.csproj" />
