@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CZJ.DNC.Feign;
 using WebApiClient;
 using WebApiClient.Attributes;
 
@@ -11,6 +8,7 @@ namespace CZJ.DNC.Web.Sample
     /// 
     /// </summary>
     [HttpHost("http://localhost:58706")]
+    [SignFilter()]
     public interface IPaymentWebApi : IHttpApi
     {
         /// <summary>
@@ -18,7 +16,8 @@ namespace CZJ.DNC.Web.Sample
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        [WebApiClient.Attributes.HttpGet("/api/values")]
+        [HttpGet("/api/values")]
+        [Timeout(1 * 1000)]
         ITask<string> GetPaymentHistoryByAccountAsync(string x);
     }
 }
