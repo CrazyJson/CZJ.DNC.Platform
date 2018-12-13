@@ -7,7 +7,7 @@ namespace CZJ.DNC.Web.Sample
     /// <summary>
     /// 
     /// </summary>
-    [HttpHost("http://192.168.0.133:6001")]
+    //[HttpHost("http://192.168.0.133:6001")]
     //[SignFilter]
     public interface IHealthApi : IHttpApi
     {
