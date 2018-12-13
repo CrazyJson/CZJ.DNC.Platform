@@ -13,13 +13,14 @@ namespace CZJ.DNC.Hystrix
     /// </summary>
     public class HystrixAfterRegister : IAfterRegister
     {
-        public IRegistrationBuilder<object, ScanningActivatorData, DynamicRegistrationStyle> Register(IRegistrationBuilder<object, ScanningActivatorData, DynamicRegistrationStyle> builderRegister, Type type, bool bClassRegister)
+        public IRegistrationBuilder<object, ScanningActivatorData, DynamicRegistrationStyle> Register(IRegistrationBuilder<object, ScanningActivatorData, DynamicRegistrationStyle> builderRegister, Type type)
         {
             var needHystrixInterceptor = type.GetMethods().Any(t => t.GetCustomAttribute<HystrixCommandAttribute>() != null);
             if (!needHystrixInterceptor)
             {
                 return builderRegister;
             }
+            bool bClassRegister = type.IsClass && !type.IsAbstract && !type.BaseType.IsInterface && type.BaseType != typeof(object);
             if (bClassRegister)
             {
                 return builderRegister.EnableClassInterceptors().InterceptedBy(typeof(HystrixInterceptor));
@@ -27,6 +28,24 @@ namespace CZJ.DNC.Hystrix
             else
             {
                 return builderRegister.EnableInterfaceInterceptors().InterceptedBy(typeof(HystrixInterceptor));
+            }
+        }
+
+        public IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> Register<TLimit, TActivatorData, TRegistrationStyle>(IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> registration, Type type)
+        {
+            var needHystrixInterceptor = type.GetMethods().Any(t => t.GetCustomAttribute<HystrixCommandAttribute>() != null);
+            if (!needHystrixInterceptor)
+            {
+                return registration;
+            }
+            bool bClassRegister = type.IsClass && !type.IsAbstract && !type.BaseType.IsInterface && type.BaseType != typeof(object);
+            if (bClassRegister)
+            {
+                return registration.InterceptedBy(typeof(HystrixInterceptor));
+            }
+            else
+            {
+                return registration.EnableInterfaceInterceptors().InterceptedBy(typeof(HystrixInterceptor));
             }
         }
     }

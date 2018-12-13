@@ -3,7 +3,6 @@ using Autofac.Builder;
 using Autofac.Core;
 using Autofac.Core.Lifetime;
 using Autofac.Extensions.DependencyInjection;
-using Autofac.Extras.DynamicProxy;
 using Autofac.Features.Scanning;
 using CZJ.Reflection;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,11 +57,15 @@ namespace CZJ.Dependency
             var arrAfterRegistrarType = listAllType.Where(t => typeof(IAfterRegister).IsAssignableFrom(t)
                 && t != typeof(IAfterRegister)).ToArray();
             List<IAfterRegister> afterRegisters = new List<IAfterRegister>();
+            IAfterRegister afterRegister = null;
             foreach (var item in arrAfterRegistrarType)
             {
-                afterRegisters.Add((IAfterRegister)Activator.CreateInstance(item));
+                afterRegister = (IAfterRegister)Activator.CreateInstance(item);
+                afterRegisters.Add(afterRegister);
+                builder.RegisterInstance(afterRegister).As<IAfterRegister>()
+                    .SingleInstance().PropertiesAutowired();
             }
-
+            RegisterExtend.afterRegisters = afterRegisters;
             //注册ITransientDependency实现类
             var dependencyType = typeof(ITransientDependency);
             //注册ISingletonDependency实现类
@@ -95,33 +98,11 @@ namespace CZJ.Dependency
                 {
                     builderRegister = builderRegister.SingleInstance();
                 }
-                builderRegister = builderRegister.PropertiesAutowired();
-                if (afterRegisters.Count > 0)
-                {
-                    builderRegister = AfterRegister(builderRegister, afterRegisters, type, bClassRegister);
-                }  
+                builderRegister = builderRegister.PropertiesAutowired().OtherRegister(type);
             }
             builder.Populate(services);
             _container = builder.Build();
             return new AutofacServiceProvider(_container);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="builderRegister"></param>
-        /// <param name="afterRegisters"></param>
-        /// <param name="type"></param>
-        /// <param name="bClassRegister"></param>
-        /// <returns></returns>
-        private IRegistrationBuilder<object, ScanningActivatorData, DynamicRegistrationStyle> AfterRegister(IRegistrationBuilder<object, ScanningActivatorData, DynamicRegistrationStyle> builderRegister
-            , List<IAfterRegister> afterRegisters, Type type, bool bClassRegister)
-        {
-            foreach (var item in afterRegisters)
-            {
-                builderRegister = item.Register(builderRegister, type, bClassRegister);
-            }
-            return builderRegister;
         }
 
         /// <summary>

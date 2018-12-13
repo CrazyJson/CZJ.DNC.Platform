@@ -23,10 +23,6 @@ namespace CZJ.DNC.Web.Controllers
         /// </summary>
         public ITestService testService { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public IPaymentWebApi paymentWebApi { get; set; }
 
         /// <summary>
         /// 检测程序Http服务是否正常
@@ -35,8 +31,7 @@ namespace CZJ.DNC.Web.Controllers
         [HttpGet]
         public async Task<string> Get()
         {
-            var p = await paymentWebApi.GetPaymentHistoryByAccountAsync("my name is ");
-            return testService.Say();
+            return await testService.Say();
         }
 
         /// <summary>
@@ -74,7 +69,7 @@ namespace CZJ.DNC.Web.Controllers
         /// 
         /// </summary>
         /// <returns></returns>
-        string Say();
+        Task<string> Say();
     }
 
     /// <summary>
@@ -83,6 +78,12 @@ namespace CZJ.DNC.Web.Controllers
     public class TestService : ITestService, ITransientDependency
     {
         private static int i = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IHealthApi healthApi { get; set; }
+
         /// <summary>
         /// 
         /// </summary>
@@ -91,15 +92,10 @@ namespace CZJ.DNC.Web.Controllers
 IsEnableCircuitBreaker = true,
 ExceptionsAllowedBeforeBreaking = 3,
 MillisecondsOfBreak = 1000 * 10, CacheTTLMilliseconds = 10 * 1000)]
-        public string Say()
+        public async Task<string> Say()
         {
-            i++;
-            if (i < 4)
-            {
-                throw new Exception("123");
-            }
-
-            return "TestService-" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            var p = await healthApi.Get("Basic F13CECD23F92526B9B9FECA81F973D32A56C6129168A058F04D977EBFBA55BF152DFDFF288D7C190D027896E6075451E");
+            return $"TestService-{p}-{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}";
         }
 
         /// <summary>

@@ -49,10 +49,10 @@ namespace CZJ.DNC.Feign
                 {
                     httpHost = httpHostAttribute.Host;
                 }
-                httpApiConfig = new HttpApiConfig { HttpHost = httpHost };
-                //httpApiConfig.GlobalFilters.Add(new TokenActionFilter());
+                httpApiConfig = new HttpApiConfig { HttpHost = httpHost };                
                 apiClient = HttpApiClient.Create(type, httpApiConfig);
-                builder.RegisterInstance(apiClient).AsImplementedInterfaces().SingleInstance().PropertiesAutowired();
+                builder.RegisterInstance(apiClient).AsImplementedInterfaces()
+                    .SingleInstance().PropertiesAutowired();
             }
         }
     }
