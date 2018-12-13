@@ -35,6 +35,18 @@ namespace CZJ.DNC.Web.Controllers
         }
 
         /// <summary>
+        /// 检测程序Http服务是否正常
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("[action]")]
+        [CustomHeader(Description = "token", Name = "Authorization", Required = true)]
+        public IActionResult GetUserInfo()
+        {
+            return Redirect("http://192.168.0.133:6001/api/SysConfig/Account/PostQuery");
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="files"></param>
