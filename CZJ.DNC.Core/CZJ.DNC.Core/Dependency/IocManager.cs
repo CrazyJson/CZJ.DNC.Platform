@@ -33,9 +33,9 @@ namespace CZJ.Dependency
             var AssemblyFinder = CurrentDomainAssemblyFinder.Instance;
             var typeFinder = TypeFinder.Instance;
 
-            builder.RegisterInstance(AssemblyFinder).As<IAssemblyFinder>().SingleInstance();
-            builder.RegisterInstance(typeFinder).As<ITypeFinder>().SingleInstance();
-            builder.RegisterInstance(Instance).As<IIocManager>().SingleInstance();
+            builder.RegisterInstance(AssemblyFinder).As<IAssemblyFinder>().SingleInstance().PropertiesAutowired();
+            builder.RegisterInstance(typeFinder).As<ITypeFinder>().SingleInstance().PropertiesAutowired();
+            builder.RegisterInstance(Instance).As<IIocManager>().SingleInstance().PropertiesAutowired();
 
             var listAllType = typeFinder.FindAll();
 

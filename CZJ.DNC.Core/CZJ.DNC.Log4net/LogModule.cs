@@ -20,7 +20,7 @@ namespace CZJ.DNC.Log4net
         /// <summary>
         /// 
         /// </summary>
-        public int Order => 130;
+        public int Order => 2;
 
         /// <summary>
         /// 

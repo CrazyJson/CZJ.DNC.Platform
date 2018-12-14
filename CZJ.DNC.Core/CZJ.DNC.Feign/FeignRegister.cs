@@ -39,6 +39,7 @@ namespace CZJ.DNC.Feign
             HttpApiClient apiClient = null;
             Uri httpHost;
             var dynamicUrlFilter = new DynamicUrlFilterAttribute();
+            var LoggerFactoryFilter = new LoggerFactoryFilterAttribute();
             bool needAddUrlFilter = false;
             foreach (var type in arrHttpApiType)
             {
@@ -53,8 +54,8 @@ namespace CZJ.DNC.Feign
                     httpHost = httpHostAttribute.Host;
                     needAddUrlFilter = false;
                 }
-
                 httpApiConfig = new HttpApiConfig { HttpHost = httpHost };
+                httpApiConfig.GlobalFilters.Add(LoggerFactoryFilter);
                 if (needAddUrlFilter)
                 {
                     httpApiConfig.GlobalFilters.Add(dynamicUrlFilter);

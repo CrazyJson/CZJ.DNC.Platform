@@ -70,11 +70,11 @@ namespace CZJ.DNC.Web
             {
                 configModules.Add((IServiceModule)Activator.CreateInstance(drType));
             }
+            configModules = configModules.OrderBy(e => e.Order).ToList();
             foreach (var module in configModules)
             {
                 module.ConfigureServices(services, configuration);
             }
-            services.RemoveAll<ILoggerProvider>();
             return IocManager.Instance.Initialize(services);
         }
 
