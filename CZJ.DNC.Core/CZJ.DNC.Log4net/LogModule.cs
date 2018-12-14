@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
@@ -28,6 +29,8 @@ namespace CZJ.DNC.Log4net
         /// <param name="configuration"></param>
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
+            services.RemoveAll<ILoggerProvider>();
+            services.AddSingleton(typeof(ILoggerProvider), new Log4NetProvider());
             Task.Factory.StartNew(() =>
             {
                 while (true)

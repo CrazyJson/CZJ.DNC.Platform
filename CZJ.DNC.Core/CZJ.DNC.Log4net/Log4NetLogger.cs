@@ -1,52 +1,24 @@
 ﻿using log4net;
-using log4net.Config;
-using log4net.Repository;
 using Microsoft.Extensions.Logging;
 using System;
-using System.IO;
-using System.Reflection;
-using System.Xml;
 
 namespace CZJ.DNC.Log4net
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Log4NetLogger : ILogger
     {
         private readonly ILog _log;
 
-        private static ILoggerRepository repository { get; set; }
-
-        private static void InitLogConfig()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="repositoryName"></param>
+        public Log4NetLogger(string name, string repositoryName)
         {
-            string baseDir = AppContext.BaseDirectory;
-            FileInfo fi = new FileInfo(AppContext.BaseDirectory + "log4net.config");
-            XmlDocument doc = new XmlDocument();
-            using (StreamReader sr = fi.OpenText())
-            {
-                doc.Load(sr);
-                XmlNodeList list = doc.SelectNodes("//appender/file");
-                foreach (XmlNode node in list)
-                {
-                    var attr = node.Attributes["value"];
-                    if (attr == null)
-                    {
-                        continue;
-                    }
-                    attr.InnerText = baseDir + (attr.InnerText.StartsWith("\\") ? attr.InnerText.Substring(1) : attr.InnerText);
-                }
-            }
-
-            repository = LogManager.CreateRepository(
-                Assembly.GetEntryAssembly(), typeof(log4net.Repository.Hierarchy.Hierarchy));
-            XmlConfigurator.Configure(repository, doc["log4net"]);
-        }
-
-        public Log4NetLogger(string name)
-        {
-            if (repository == null)
-            {
-                InitLogConfig();
-            }
-            _log = LogManager.GetLogger(repository.Name, name);
+            _log = LogManager.GetLogger(repositoryName, name);
         }
 
         public IDisposable BeginScope<TState>(TState state)
@@ -86,11 +58,7 @@ namespace CZJ.DNC.Log4net
             {
                 throw new ArgumentNullException(nameof(formatter));
             }
-            string message = null;
-            if (null != formatter)
-            {
-                message = formatter(state, exception);
-            }
+            string message = formatter(state, exception);
             if (!string.IsNullOrEmpty(message) || exception != null)
             {
                 switch (logLevel)
