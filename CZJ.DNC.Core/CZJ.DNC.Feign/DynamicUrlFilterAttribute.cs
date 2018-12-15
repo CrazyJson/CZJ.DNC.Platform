@@ -1,7 +1,8 @@
 ﻿using CZJ.Dependency;
+using CZJ.DNC.Core;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Text;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using WebApiClient.Attributes;
 using WebApiClient.Contexts;
@@ -31,24 +32,43 @@ namespace CZJ.DNC.Feign
         /// </summary>
         /// <param name="context">上下文</param>
         /// <returns></returns>
-        public override Task OnBeginRequestAsync(ApiActionContext context)
+        public override async Task OnBeginRequestAsync(ApiActionContext context)
         {
             context.Tags.Set(tagKey, DateTime.Now);
             //动态获取host
-            //IocManager.Instance.Resolve<IDy>()
-            string url = "http://192.168.0.133:6001" + context.RequestMessage.RequestUri.PathAndQuery;
+            string[] hosts = null;
+            try
+            {
+                var provider = IocManager.Instance.Resolve<IServiceDiscoveryProvider>();
+                var dict = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+                object objAppNo = context.Tags["AppNo"];
+                dict["AppNo"] = objAppNo;
+                hosts = await provider.GetHost(context.RequestMessage.RequestUri, context.RequestMessage.Method, dict);
+                if (hosts == null || hosts.Length == 0)
+                {
+                    throw new Exception($"未找到{(objAppNo != null && !string.IsNullOrEmpty(objAppNo.ToString()) ? objAppNo.ToString() : "")}" +
+                        $"【{context.RequestMessage.Method.ToString()}{context.RequestMessage.RequestUri.PathAndQuery}】的节点信息");
+                }
+            }
+            catch
+            {
+                throw new Exception("未注册IServiceDiscoveryProvider服务的实现类");
+            }
+            Random rand = new Random();
+            var index = rand.Next(hosts.Length);
+            var host = hosts[index];
+            string url = host + context.RequestMessage.RequestUri.PathAndQuery;
             Uri uri = new Uri(url);
             if (context.HttpApiConfig.LoggerFactory != null)
             {
                 var method = context.ApiActionDescriptor.Member;
                 var categoryName = $"{method.DeclaringType.Name}.{method.Name}";
                 var logger = context.HttpApiConfig.LoggerFactory.CreateLogger<DynamicUrlFilterAttribute>();
-                logger.LogInformation("服务间调用插件Feign【{0}】--获取到请求【{1} {2}】的实际节点：【{3}:{4}】",
+                logger.LogInformation("服务间调用插件Feign【{0}】--获取到请求【{1} {2}】的实际节点：【{3}】",
                       categoryName, context.RequestMessage.Method.ToString(),
-                        context.RequestMessage.RequestUri.PathAndQuery, uri.Host, uri.Port);
+                        context.RequestMessage.RequestUri.PathAndQuery, string.Join("，", hosts));
             }
             context.RequestMessage.RequestUri = uri;
-            return base.OnBeginRequestAsync(context);
         }
 
         public override Task OnEndRequestAsync(ApiActionContext context)

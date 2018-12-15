@@ -8,6 +8,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
+using System.Collections.Generic;
+using CZJ.DNC.Core;
 
 namespace CZJ.Discovery.Consul
 {
@@ -21,9 +24,10 @@ namespace CZJ.Discovery.Consul
         //是否需要向注册中心注册信息
         private bool needRegister;
 
-        private string consulIP;
+        //服务是否启动了https协议
+        private string enableHttps;
 
-        private string consulPort;
+        private string consulHost;
 
         /// <summary>
         /// 
@@ -39,7 +43,7 @@ namespace CZJ.Discovery.Consul
                 return;
             }
             //请求注册的 Consul 地址
-            var consulClient = new ConsulClient(x => x.Address = new Uri($"http://{consulIP}:{consulPort}"));
+            var consulClient = new ConsulClient(x => x.Address = new Uri($"http://{consulHost}"));
             var appInfo = app.ApplicationServices.GetRequiredService<IAppInfoProvider>();
             var lifetime = app.ApplicationServices.GetRequiredService<IApplicationLifetime>();
             var httpCheck = new AgentServiceCheck()
@@ -51,6 +55,8 @@ namespace CZJ.Discovery.Consul
             };
 
             // Register service with consul
+            var meta = new Dictionary<string, string>();
+            meta["EnableHttps"] = enableHttps;
             var registration = new AgentServiceRegistration()
             {
                 Checks = new[] { httpCheck },
@@ -58,7 +64,8 @@ namespace CZJ.Discovery.Consul
                 Name = SysConfig.MicroServiceOption.Name,
                 Address = appInfo.IpAddress,
                 Port = Convert.ToInt32(appInfo.Ports[0]),
-                Tags = SysConfig.MicroServiceOption.Tags
+                Tags = SysConfig.MicroServiceOption.Tags,
+                Meta = meta
             };
             try
             {
@@ -83,9 +90,13 @@ namespace CZJ.Discovery.Consul
         /// <param name="configuration"></param>
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
+            if (services.FirstOrDefault(e => e.ServiceType == typeof(IServiceDiscoveryProvider)) == null)
+            {
+                services.AddSingleton<IServiceDiscoveryProvider, ConsulServiceDiscoveryProvider>();
+            }
             needRegister = configuration.GetValue<string>("needRegister") == "1";
-            consulIP = configuration["MicroService:consul:ip"];
-            consulPort = configuration["MicroService:consul:port"];
+            consulHost = configuration["MicroService:consul:host"];
+            enableHttps = configuration.GetValue<bool>("EnableHttps") ? "1" : "0";
         }
     }
 }

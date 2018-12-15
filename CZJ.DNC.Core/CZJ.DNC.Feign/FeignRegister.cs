@@ -21,7 +21,7 @@ namespace CZJ.DNC.Feign
         {
             get
             {
-                return 20;
+                return 19;
             }
         }
 
