@@ -37,22 +37,23 @@ namespace CZJ.DNC.Feign
             context.Tags.Set(tagKey, DateTime.Now);
             //动态获取host
             string[] hosts = null;
+            IServiceDiscoveryProvider provider = null;
             try
             {
-                var provider = IocManager.Instance.Resolve<IServiceDiscoveryProvider>();
-                var dict = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-                object objAppNo = context.Tags["AppNo"];
-                dict["AppNo"] = objAppNo;
-                hosts = await provider.GetHost(context.RequestMessage.RequestUri, context.RequestMessage.Method, dict);
-                if (hosts == null || hosts.Length == 0)
-                {
-                    throw new Exception($"未找到{(objAppNo != null && !string.IsNullOrEmpty(objAppNo.ToString()) ? objAppNo.ToString() : "")}" +
-                        $"【{context.RequestMessage.Method.ToString()}{context.RequestMessage.RequestUri.PathAndQuery}】的节点信息");
-                }
+                provider = IocManager.Instance.Resolve<IServiceDiscoveryProvider>();
             }
             catch
             {
                 throw new Exception("未注册IServiceDiscoveryProvider服务的实现类");
+            }
+            var dict = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            object objAppNo = context.Tags["AppNo"];
+            dict["AppNo"] = objAppNo;
+            hosts = await provider.GetHost(context.RequestMessage.RequestUri, context.RequestMessage.Method, dict);
+            if (hosts == null || hosts.Length == 0)
+            {
+                throw new Exception($"未找到{(objAppNo != null && !string.IsNullOrEmpty(objAppNo.ToString()) ? objAppNo.ToString() : "")}" +
+                    $"【{context.RequestMessage.Method.ToString()}{context.RequestMessage.RequestUri.PathAndQuery}】的节点信息");
             }
             Random rand = new Random();
             var index = rand.Next(hosts.Length);

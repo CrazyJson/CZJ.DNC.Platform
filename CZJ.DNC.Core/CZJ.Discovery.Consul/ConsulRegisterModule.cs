@@ -17,7 +17,7 @@ namespace CZJ.Discovery.Consul
     /// <summary>
     /// 微服务注册
     /// </summary>
-    public class ConsulRegister : IServiceModule
+    public class ConsulRegisterModule : IServiceModule
     {
         public int Order => 20;
 
@@ -74,7 +74,7 @@ namespace CZJ.Discovery.Consul
             }
             catch (Exception e)
             {
-                var logger = loggerFactory.CreateLogger<ConsulRegister>();
+                var logger = loggerFactory.CreateLogger<ConsulRegisterModule>();
                 logger.LogError(e, $"向consul【{consulClient.Config.Address}】注册失败！");
             }
             lifetime.ApplicationStopping.Register(() =>

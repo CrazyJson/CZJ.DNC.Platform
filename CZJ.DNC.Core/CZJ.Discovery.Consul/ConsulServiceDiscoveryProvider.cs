@@ -17,7 +17,16 @@ namespace CZJ.Discovery.Consul
         /// <summary>
         /// 配置信息
         /// </summary>
-        public IConfiguration configuration { get; set; }
+        private readonly IConfiguration configuration;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="configuration"></param>
+        public ConsulServiceDiscoveryProvider(IConfiguration configuration)
+        {
+            this.configuration = configuration;
+        }
 
         /// <summary>
         /// 获取服务实际节点

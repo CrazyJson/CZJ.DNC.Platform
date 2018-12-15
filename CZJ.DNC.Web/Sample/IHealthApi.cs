@@ -15,7 +15,7 @@ namespace CZJ.DNC.Web.Sample
         /// 
         /// </summary>
         /// <returns></returns>
-        [HttpGet("/api/SysConfig/UAC/GetUserInfo?a=12")]       
+        [HttpGet("/api/health")]       
         //[Timeout(1 * 1000)]
         [Tags("AppNo","SysConfig")]
         ITask<string> Get([Header("Authorization")]string token);
