@@ -4,6 +4,7 @@ using Polly;
 using System;
 using System.Collections.Concurrent;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace CZJ.DNC.Hystrix
 {
@@ -63,7 +64,7 @@ namespace CZJ.DNC.Hystrix
                               //还是第一次的对象，所以要通过Polly的上下文来传递AspectContext
                               //context.ReturnValue = fallBackResult;
                               invocationContext.ReturnValue = fallBackResult;
-                          }, (ex, t) => {  });
+                          }, (ex, t) => { });
                         policy = policyFallBack.Wrap(policy);
                         //放入
                         policies.TryAdd(invocation.MethodInvocationTarget, policy);
@@ -87,7 +88,15 @@ namespace CZJ.DNC.Hystrix
                     else
                     {
                         //如果缓存中没有，则执行实际被拦截的方法
-                        policy.Execute(ctx => { invocation.Proceed(); }, pollyCtx);
+                        policy.Execute(ctx =>
+                        {
+                            invocation.Proceed();
+                            if (invocation.ReturnValue is Task)
+                            {
+                                var task = invocation.ReturnValue as Task;
+                                task.Wait();
+                            }
+                        }, pollyCtx);
                         //存入缓存中
                         using (var cacheEntry = memoryCache.CreateEntry(cacheKey))
                         {
@@ -98,7 +107,15 @@ namespace CZJ.DNC.Hystrix
                 }
                 else//如果没有启用缓存，就直接执行业务方法
                 {
-                    policy.Execute(ctx => { invocation.Proceed(); }, pollyCtx);
+                    policy.Execute(ctx =>
+                    {
+                        invocation.Proceed();
+                        if (invocation.ReturnValue is Task)
+                        {
+                            var task = invocation.ReturnValue as Task;
+                            task.Wait();
+                        }
+                    }, pollyCtx);
                 }
             }
         }
