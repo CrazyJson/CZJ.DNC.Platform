@@ -40,6 +40,17 @@ namespace CZJ.DNC.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("[action]")]
+        public string GetXX()
+        {
+            return testService.SayXX();
+        }
+
+        /// <summary>
+        /// 检测程序Http服务是否正常
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("[action]")]
         [CustomHeader(Description = "token", Name = "Authorization", Required = true)]
         public IActionResult GetUserInfo()
         {
@@ -82,6 +93,8 @@ namespace CZJ.DNC.Web.Controllers
         /// </summary>
         /// <returns></returns>
         Task<string> Say();
+
+        string SayXX();
     }
 
     /// <summary>
@@ -96,6 +109,8 @@ namespace CZJ.DNC.Web.Controllers
         /// </summary>
         public IHealthApi healthApi { get; set; }
 
+        public IAccountApi accountApi { get; set; }
+
         /// <summary>
         /// 
         /// </summary>
@@ -103,20 +118,40 @@ namespace CZJ.DNC.Web.Controllers
         [HystrixCommand(nameof(FallBackMethod),
 IsEnableCircuitBreaker = true,
 ExceptionsAllowedBeforeBreaking = 3,
-MillisecondsOfBreak = 1000 * 10, CacheTTLMilliseconds = 10 * 1000)]
+MillisecondsOfBreak = 1000 * 10)]
         public async Task<string> Say()
         {
             var p = await healthApi.Get("Basic F13CECD23F92526B9B9FECA81F973D32A56C6129168A058F04D977EBFBA55BF152DFDFF288D7C190D027896E6075451E");
             return $"TestService-{p}-{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}";
         }
 
+        [HystrixCommand(nameof(FallBackSayXX),
+IsEnableCircuitBreaker = true,
+ExceptionsAllowedBeforeBreaking = 3,
+MillisecondsOfBreak = 1000 * 10)]
+        public string SayXX()
+        {
+            //return "123";
+            throw new Exception("123");
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public string FallBackMethod()
+        public async Task<string> FallBackMethod()
         {
-            return "FallBackMethod";
+            var list = await accountApi.Get("Basic F13CECD23F92526B9B9FECA81F973D32A56C6129168A058F04D977EBFBA55BF152DFDFF288D7C190D027896E6075451E");
+            return list;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public string FallBackSayXX()
+        {
+            return "FallBackSayXX";
         }
     }
 
