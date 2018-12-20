@@ -29,6 +29,7 @@ namespace CZJ.DNC.Web.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [CustomHeader(Description = "token", Name = "Authorization", Required = true)]
         public async Task<string> Get()
         {
             return await testService.Say();
@@ -109,6 +110,9 @@ namespace CZJ.DNC.Web.Controllers
         /// </summary>
         public IHealthApi healthApi { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IAccountApi accountApi { get; set; }
 
         /// <summary>
@@ -121,7 +125,8 @@ ExceptionsAllowedBeforeBreaking = 3,
 MillisecondsOfBreak = 1000 * 10)]
         public async Task<string> Say()
         {
-            var p = await healthApi.Get("Basic F13CECD23F92526B9B9FECA81F973D32A56C6129168A058F04D977EBFBA55BF152DFDFF288D7C190D027896E6075451E");
+            var p = await accountApi.Get();
+            //var p = await healthApi.Get("Basic F13CECD23F92526B9B9FECA81F973D32A56C6129168A058F04D977EBFBA55BF152DFDFF288D7C190D027896E6075451E");
             return $"TestService-{p}-{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}";
         }
 
@@ -141,7 +146,7 @@ MillisecondsOfBreak = 1000 * 10)]
         /// <returns></returns>
         public async Task<string> FallBackMethod()
         {
-            var list = await accountApi.Get("Basic F13CECD23F92526B9B9FECA81F973D32A56C6129168A058F04D977EBFBA55BF152DFDFF288D7C190D027896E6075451E");
+            var list = await accountApi.Get();
             return list;
         }
 
