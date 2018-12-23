@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace System.Net.Http
@@ -36,15 +37,31 @@ namespace System.Net.Http
             if (requestMethod != HttpMethod.Get &&
                 requestMethod != HttpMethod.Head &&
                 requestMethod != HttpMethod.Trace
-                && request.Body != null
                 )
             {
                 HttpContent content = null;
-                if (request.MediaType == "application/json")
+                if (request.HasFile)
+                {
+                    //文件上传
+                    var form = new MultipartFormDataContent();
+                    foreach (var file in request.FileParameters)
+                    {
+                        var fileContent = new ByteArrayContent(file.Bytes);
+                        fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                        {
+                            FileName = file.FileName,
+                            Name = file.Name
+                        };
+                        fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+                        form.Add(fileContent);
+                    }
+                    content = form;
+                }
+                else if (request.MediaType == "application/json" && request.Body != null)
                 {
                     content = new StringContent(JsonConvert.SerializeObject(request.Body), Encoding.UTF8, request.MediaType);
                 }
-                else if (request.MediaType == "application/x-www-form-urlencoded")
+                else if (request.MediaType == "application/x-www-form-urlencoded" && request.Body != null)
                 {
                     content = new FormUrlEncodedContent(request.Body as IEnumerable<KeyValuePair<string, string>>);
                 }
@@ -171,10 +188,24 @@ namespace System.Net.Http
 
         private static async Task<HttpResponseMessage> GetHttpResponseMessage(CitmsHttpRequest request, HttpRequestMessage requestMessage)
         {
+            var maxTimeout = _client.Timeout;
+            var timeSpan = TimeSpan.FromMilliseconds(request.TimeOutMilliseconds);
+            if (maxTimeout >= TimeSpan.Zero && timeSpan > maxTimeout)
+            {
+                throw new Exception($"Timeout值{timeSpan}不能超时HttpClient.Timeout[{maxTimeout}]");
+            }
             try
             {
                 var client = CreateClient(request);
-                return await client.SendAsync(requestMessage);
+                if (request.TimeOutMilliseconds <= 0)
+                {
+                    return await client.SendAsync(requestMessage);
+                }
+                else
+                {
+                    var cancellation = new CancellationTokenSource(timeSpan);
+                    return await client.SendAsync(requestMessage, cancellation.Token);
+                }
             }
             catch (HttpRequestException e)
             {

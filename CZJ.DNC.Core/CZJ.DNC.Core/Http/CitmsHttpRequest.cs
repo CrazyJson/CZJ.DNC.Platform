@@ -77,6 +77,11 @@ namespace System.Net.Http
         /// </summary>
         public bool HasFile => FileParameters.Any();
 
+        /// <summary>
+        /// 请求超时时间
+        /// </summary>
+        public double TimeOutMilliseconds { get; set; }
+
         #endregion
 
         /// <summary>
@@ -88,6 +93,7 @@ namespace System.Net.Http
         /// 配合Body使用
         /// application/json
         /// application/x-www-form-urlencoded
+        /// multipart/form-data
         /// </summary>
         public string MediaType { get; set; } = "application/json";
     }
