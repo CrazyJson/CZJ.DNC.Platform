@@ -158,7 +158,7 @@ namespace CZJ.DNC.Excel
         /// </summary>
         /// <param name="sheet">sheet标签</param>
         /// <param name="columnIndex">列索引</param>
-        public static void AutoSizeColumn(ISheet sheet,int columnIndex)
+        public static void AutoSizeColumn(ISheet sheet, int columnIndex)
         {
             sheet.AutoSizeColumn(columnIndex);
             int width = sheet.GetColumnWidth(columnIndex) + 2560;
@@ -261,6 +261,7 @@ namespace CZJ.DNC.Excel
         /// 从excel中所有sheet中读取数据
         /// </summary>
         /// <param name="ins">输入流</param>
+        ///<param name="sheetNames">从哪些标签页取数据</param>
         /// <param name="headRowIndex">标题行索引 默认为第6行</param>
         /// <param name="listSheet">所有有数据的Sheet</param>
         /// <returns>DataTable</returns>
@@ -405,7 +406,7 @@ namespace CZJ.DNC.Excel
             cellStyle.VerticalAlignment = VerticalAlignment.Center;
             cellStyle.Alignment = HorizontalAlignment.Center;
             IFont font = wb.CreateFont();
-            font.Boldweight = short.MaxValue;
+            font.Boldweight = (short)FontBoldWeight.Bold;
             font.Color = HSSFColor.Red.Index;
             cellStyle.SetFont(font);
             cellStyle.FillPattern = FillPattern.SolidForeground;
@@ -634,7 +635,7 @@ namespace CZJ.DNC.Excel
                     rfont.FontHeightInPoints = 12;
                     remarkStyle.SetFont(rfont);
                     rcell.CellStyle = remarkStyle;
-                    RemarkRow.HeightInPoints = rowHeight * 5;
+                    RemarkRow.HeightInPoints = rowHeight * 3;
                     rcell.SetCellValue(sheetInfo.Remark);
                 }
                 //表头
@@ -668,7 +669,7 @@ namespace CZJ.DNC.Excel
                             cellValue = sheetInfo.Data.Rows[rowIndex][item.Field];
                             Type columnType = sheetInfo.Data.Columns[item.Field].DataType;
                             cell.SetCellValue(cellValue, columnType);
-                            cell.CellStyle = cellStyle;
+                            //cell.CellStyle = cellStyle;
                             if (item.IsLink)
                             {
                                 cellValue = sheetInfo.Data.Rows[rowIndex][item.Field + "Link"];
@@ -832,19 +833,15 @@ namespace CZJ.DNC.Excel
             //首行样式
             ICellStyle headerStyle = workbook.CreateCellStyle();
             IFont font = workbook.CreateFont();
-            font.Boldweight = short.MaxValue;
+            font.Boldweight = (short)FontBoldWeight.Bold;
+            font.FontHeightInPoints = 10;
             headerStyle.SetFont(font);
             headerStyle.VerticalAlignment = VerticalAlignment.Center;
             headerStyle.Alignment = HorizontalAlignment.Center;
-            if (!headerGroup)
+            headerStyle.FillPattern = FillPattern.SolidForeground;
+            headerStyle.FillForegroundColor = HSSFColor.Grey25Percent.Index;
+            if (headerGroup)
             {
-                headerStyle.FillPattern = FillPattern.SolidForeground;
-                headerStyle.FillForegroundColor = HSSFColor.Grey25Percent.Index;
-            }
-            else
-            {
-                headerStyle.FillPattern = FillPattern.SolidForeground;
-                headerStyle.FillForegroundColor = HSSFColor.LightCornflowerBlue.Index;
                 headerStyle.BorderTop = BorderStyle.Thin;
                 headerStyle.BorderLeft = BorderStyle.Thin;
                 headerStyle.BorderRight = BorderStyle.Thin;
@@ -989,50 +986,6 @@ namespace CZJ.DNC.Excel
             return culumnStyle;
         }
         #endregion
-    }
-
-    /// <summary>
-    /// NPOI拓展方法
-    /// </summary>
-    public static class NPOIExtend
-    {
-        /// <summary>
-        /// 冻结表格
-        /// </summary>
-        /// <param name="sheet">sheet</param>
-        /// <param name="colCount">冻结的列数</param>
-        /// <param name="rowCount">冻结的行数</param>
-        /// <param name="startCol">右边区域可见的首列序号，从1开始计算</param>
-        /// <param name="startRow">下边区域可见的首行序号，也是从1开始计算</param>
-        /// <example>
-        /// sheet1.CreateFreezePane(0, 1, 0, 1); 冻结首行
-        /// sheet1.CreateFreezePane(1, 0, 1, 0);冻结首列
-        /// </example>
-        public static void FreezePane(this ISheet sheet, int colCount, int rowCount, int startCol, int startRow)
-        {
-            sheet.CreateFreezePane(colCount, rowCount, startCol, startRow);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="cell"></param>
-        /// <param name="cellValue"></param>
-        /// <param name="columnType"></param>
-        public static void SetCellValue(this ICell cell, object cellValue, Type columnType)
-        {
-            if (columnType == typeof(double) ||
-                columnType == typeof(float) ||
-                columnType == typeof(int) ||
-                columnType == typeof(long))
-            {
-                cell.SetCellValue(cellValue != DBNull.Value ? Convert.ToDouble(cellValue) : 0);
-            }
-            else
-            {
-                cell.SetCellValue(cellValue != DBNull.Value ? cellValue.ToString() : string.Empty);
-            }
-        }
     }
 }
 

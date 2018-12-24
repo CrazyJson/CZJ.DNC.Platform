@@ -95,6 +95,10 @@ namespace CZJ.DNC.Web.Controllers
         /// <returns></returns>
         Task<string> Say();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         string SayXX();
     }
 
@@ -103,7 +107,7 @@ namespace CZJ.DNC.Web.Controllers
     /// </summary>
     public class TestService : ITestService, ITransientDependency
     {
-        private static int i = 0;
+        //private static int i = 0;
 
         /// <summary>
         /// 
@@ -130,6 +134,10 @@ MillisecondsOfBreak = 1000 * 10)]
             return $"TestService-{p}-{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}";
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [HystrixCommand(nameof(FallBackSayXX),
 IsEnableCircuitBreaker = true,
 ExceptionsAllowedBeforeBreaking = 3,

@@ -88,7 +88,7 @@ namespace CZJ.DNC.Web
                 }
                 catch (Exception e)
                 {
-
+                    Console.WriteLine(e);
                 }
             }
         }

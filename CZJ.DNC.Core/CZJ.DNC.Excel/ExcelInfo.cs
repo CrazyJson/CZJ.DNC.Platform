@@ -147,7 +147,6 @@ namespace CZJ.DNC.Excel
             if (data != null)
             {
                 DataRow dr = null;
-                int i = 0;
                 foreach (var item in data)
                 {
                     dr = dt.NewRow();
