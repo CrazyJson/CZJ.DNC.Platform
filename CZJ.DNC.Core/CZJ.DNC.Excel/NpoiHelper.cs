@@ -27,6 +27,43 @@ namespace CZJ.DNC.Excel
         /// </summary>
         private const int rowHeight = 20;
 
+
+        /// <summary>
+        /// 生成EXECL文件，通过读取DataTable和列头映射信息
+        /// </summary>
+        /// <param name="excelInfo">Excel导出信息</param>
+        /// <returns>内存流</returns>
+        public static MemoryStream Export1(ExcelInfo excelInfo)
+        {
+            if (excelInfo == null || excelInfo.Data == null || excelInfo.ColumnInfoList == null)
+            {
+                throw new ArgumentNullException();
+            }
+            IWorkbook workbook = new XSSFWorkbook();
+            var sheet = workbook.CreateSheet();
+            IRow row = sheet.CreateRow(0);
+            ICell cell =null;
+            for (int i=0;i< excelInfo.ColumnInfoList.Count; i++)
+            {
+                cell = row.CreateCell(i);
+                cell.SetCellValue(excelInfo.ColumnInfoList[i].Header);
+            }
+            int iRow = 1;
+            foreach (DataRow dr in excelInfo.Data.Rows)
+            {
+                row = sheet.CreateRow(iRow);
+                for (int i = 0; i < excelInfo.ColumnInfoList.Count; i++)
+                {
+                    cell = row.CreateCell(i);
+                    cell.SetCellValue(dr[excelInfo.ColumnInfoList[i].Field].ToString());
+                }
+                iRow++;
+            }
+            MemoryStream ms = new MemoryStream();
+            workbook.Write(ms);
+            return ms;
+        }
+
         /// <summary>
         /// 生成EXECL文件，通过读取DataTable和列头映射信息
         /// </summary>

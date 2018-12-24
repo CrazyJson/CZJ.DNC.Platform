@@ -23,7 +23,7 @@ namespace CZJ.DNC.Excel
             //1.获取列表对应数据
             info.Data = await GetGirdData(info, headers);
             //2.创建文档
-            MemoryStream ms = NPOIHelper.Export(info);
+            MemoryStream ms = NPOIHelper.Export1(info);
             return ms;
         }
 

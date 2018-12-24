@@ -38,7 +38,7 @@ namespace CZJ.Excel.Controllers
         /// <returns>内存流信息</returns>
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> Export([FromBody]ExcelInfo info)
+        public async Task Export([FromBody]ExcelInfo info)
         {
             if (info == null)
             {
@@ -74,7 +74,13 @@ namespace CZJ.Excel.Controllers
                 byte[] msbyte = ms.GetBuffer();
                 Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
                 Response.Headers.Add("Content-Disposition", string.Format("attachment;filename={0}", Uri.EscapeUriString(info.FileName)));
-                return File(msbyte, MimeHelper.GetMineType(info.FileName));
+                Response.Headers.Add("Content-Length", msbyte.LongLength.ToString());
+
+                Response.ContentType = "application/octet-stream";
+                Response.Body.Write(msbyte, 0, msbyte.Length);
+                Response.Body.Flush();
+                //return File(msbyte, MimeHelper.GetMineType(info.FileName));
+                //return File(msbyte, "application/vnd.ms-excel");
             }                     
         }
 
