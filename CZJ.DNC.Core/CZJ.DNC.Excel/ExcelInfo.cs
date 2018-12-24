@@ -61,16 +61,11 @@ namespace CZJ.DNC.Excel
         [JsonIgnore]
         public DataTable Data { get; set; }
 
-        private bool isExportSelectData = false;
         /// <summary>
         /// 是否为导出当前选中数据
-        /// 如果wei true 则不进行远程查询
+        /// 如果为true 则不进行远程查询
         /// </summary>
-        public bool IsExportSelectData
-        {
-            get { return isExportSelectData; }
-            set { isExportSelectData = value; }
-        }
+        public bool IsExportSelectData { get; set; } = false;
 
         /// <summary>
         /// 备注信息-不为空将放置在第一行
@@ -83,7 +78,7 @@ namespace CZJ.DNC.Excel
         /// <returns></returns>
         public string GetFileExt()
         {
-            if (string.IsNullOrEmpty(FileName))
+            if (!string.IsNullOrEmpty(FileName))
             {
                 return Path.GetExtension(FileName);
             }

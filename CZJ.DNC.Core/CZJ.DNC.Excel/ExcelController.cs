@@ -47,7 +47,7 @@ namespace CZJ.Excel.Controllers
             string fileExt = info.GetFileExt();
             if (string.IsNullOrEmpty(info.FileName))
             {
-                info.FileName = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + fileExt;
+                info.FileName = DateTime.Now.ToString("yyyyMMddHHmmss") + fileExt;
             }
             else
             {
@@ -69,12 +69,13 @@ namespace CZJ.Excel.Controllers
                     info.Api = $"{Request.Scheme}://{Request.Host}{info.Api}";
                 }
             }
-            using (MemoryStream ms = await info.ExportExeclStream(Request.Headers))
+            using (var ms = await info.ExportExeclStream(Request.Headers))
             {
+                byte[] msbyte = ms.GetBuffer();
                 Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
                 Response.Headers.Add("Content-Disposition", string.Format("attachment;filename={0}", Uri.EscapeUriString(info.FileName)));
-                return File(ms, MimeHelper.GetMineType(info.FileName));
-            }
+                return File(msbyte, MimeHelper.GetMineType(info.FileName));
+            }                     
         }
 
         /// <summary>

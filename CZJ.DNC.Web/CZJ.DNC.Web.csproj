@@ -33,6 +33,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CZJ.DNC.Core\CZJ.Discovery.Consul\CZJ.Discovery.Consul.csproj" />
     <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.Core\CZJ.DNC.Core.csproj" />
+    <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.Excel\CZJ.DNC.Excel.csproj" />
     <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.Feign\CZJ.DNC.Feign.csproj" />
     <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.Hystrix\CZJ.DNC.Hystrix.csproj" />
     <ProjectReference Include="..\CZJ.DNC.Core\CZJ.DNC.License\CZJ.DNC.License.csproj" />

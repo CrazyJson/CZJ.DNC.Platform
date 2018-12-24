@@ -1,5 +1,4 @@
-﻿using CZJ.Common.Core;
-using CZJ.Dependency;
+﻿using CZJ.Dependency;
 using NPOI.SS.UserModel;
 using System;
 using System.Collections.Generic;
@@ -69,12 +68,11 @@ namespace CZJ.DNC.Excel
         ///从上传文件流中读取数据 保存为datatable
         /// </summary>
         /// <param name="ins">输入流</param>
-        /// <param name="fileName">文件名</param>
         /// <param name="datasheet">数据得sheet表格</param>
         /// <returns>数据</returns>
-        public virtual DataTable GetDataFromExcel(Stream ins, string fileName, out ISheet datasheet)
+        public virtual DataTable GetDataFromExcel(Stream ins, out ISheet datasheet)
         {
-            return NPOIHelper.GetDataFromExcel(ins, fileName, out datasheet, StartRowIndex);
+            return NPOIHelper.GetDataFromExcel(ins, out datasheet, StartRowIndex);
         }
 
         /// <summary>
@@ -92,7 +90,7 @@ namespace CZJ.DNC.Excel
             return Task.Factory.StartNew(() =>
             {
                 //1.读取数据
-                DataTable dt = GetDataFromExcel(ins, fileName, out ISheet datasheet);
+                DataTable dt = GetDataFromExcel(ins, out ISheet datasheet);
 
                 //2.校验列是否正确
                 //相同列数
@@ -307,10 +305,7 @@ namespace CZJ.DNC.Excel
                 errorCell.SetCellValue("错误信息");
 
                 //自适应列宽度
-                sheet.AutoSizeColumn(columnCount);
-                int width = sheet.GetColumnWidth(columnCount) + 2560;
-                sheet.SetColumnWidth(columnCount, width > NPOIHelper.MAX_COLUMN_WIDTH ? NPOIHelper.MAX_COLUMN_WIDTH : width);
-
+                NPOIHelper.AutoSizeColumn(sheet, columnCount);
                 result.Message = ExcelImportHelper.GetErrorExcel(wb, fileName);
             }
             else
@@ -342,40 +337,5 @@ namespace CZJ.DNC.Excel
             }
             return columns;
         }
-    }
-
-
-
-
-
-    /// <summary>
-    /// 校验参数信息
-    /// </summary>
-    public class ImportVerifyParam
-    {
-        /// <summary>
-        /// Excel数据源
-        /// </summary>
-        public DataTable DTExcel { get; set; }
-
-        /// <summary>
-        /// 行索引
-        /// </summary>
-        public int RowIndex { get; set; }
-
-        /// <summary>
-        /// 列索引
-        /// </summary>
-        public int ColumnIndex { get; set; }
-
-        /// <summary>
-        /// 列名
-        /// </summary>
-        public string ColName { get; set; }
-
-        /// <summary>
-        /// 列值
-        /// </summary>
-        public object CellValue { get; set; }
     }
 }

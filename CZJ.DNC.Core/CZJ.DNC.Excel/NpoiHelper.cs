@@ -20,7 +20,7 @@ namespace CZJ.DNC.Excel
         /// <summary>
         /// EXECL最大列宽
         /// </summary>
-        public const int MAX_COLUMN_WIDTH = 100 * 256;
+        private const int maxColumnWidth = 100 * 256;
 
         /// <summary>
         /// 默认行高
@@ -50,7 +50,6 @@ namespace CZJ.DNC.Excel
             WriteSheetInfo(workbook, sheetInfo);
             MemoryStream ms = new MemoryStream();
             workbook.Write(ms);
-            ms.Position = 0;
             return ms;
         }
 
@@ -68,7 +67,7 @@ namespace CZJ.DNC.Excel
             string fileExt = ".xlsx";
             if (string.IsNullOrEmpty(multiSheet.FileName))
             {
-                multiSheet.FileName = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + fileExt;
+                multiSheet.FileName = DateTime.Now.ToString("yyyyMMddHHmmss") + fileExt;
             }
             else if (string.IsNullOrEmpty(Path.GetExtension(multiSheet.FileName)))
             {
@@ -154,18 +153,30 @@ namespace CZJ.DNC.Excel
             return null;
         }
 
+        /// <summary>
+        /// 某一列自适应内容宽度
+        /// </summary>
+        /// <param name="sheet">sheet标签</param>
+        /// <param name="columnIndex">列索引</param>
+        public static void AutoSizeColumn(ISheet sheet,int columnIndex)
+        {
+            sheet.AutoSizeColumn(columnIndex);
+            int width = sheet.GetColumnWidth(columnIndex) + 2560;
+            sheet.SetColumnWidth(columnIndex, width > maxColumnWidth ? maxColumnWidth : width);
+        }
+
         #region "Excel模版数据读取相关"
+
         /// <summary>
         /// 从excel第一个sheet中读取数据
         /// </summary>
         /// <param name="ins">输入流</param>
-        /// <param name="fileName">文件名</param>
         /// <param name="headRowIndex">标题行索引 默认为第6行</param>
         /// <param name="fSheet">第一个sheet</param>
         /// <returns>DataTable</returns>
-        public static DataTable GetDataFromExcel(Stream ins, string fileName, out ISheet fSheet, int headRowIndex = 5)
+        public static DataTable GetDataFromExcel(Stream ins, out ISheet fSheet, int headRowIndex = 5)
         {
-            IWorkbook workbook = GetWorkbook(fileName, ins);
+            IWorkbook workbook = GetWorkbook(ins);
             fSheet = null;
             DataTable dt = new DataTable();
             if (workbook.NumberOfSheets > 0)
@@ -255,7 +266,7 @@ namespace CZJ.DNC.Excel
         /// <returns>DataTable</returns>
         public static DataSet GetDataSetFromExcel(Stream ins, List<string> sheetNames, int headRowIndex, out List<ISheet> listSheet)
         {
-            IWorkbook workbook = InitWorkBook(ins);
+            IWorkbook workbook = GetWorkbook(ins);
             DataSet ds = new DataSet();
             List<ISheet> sheets = new List<ISheet>();
             if (workbook.NumberOfSheets > 0)
@@ -684,9 +695,7 @@ namespace CZJ.DNC.Excel
                 {
                     for (int j = 0; j < ColumnInfoList.Count; j++)
                     {
-                        sheet.AutoSizeColumn(j);
-                        int width = sheet.GetColumnWidth(j) + 2560;
-                        sheet.SetColumnWidth(j, width > MAX_COLUMN_WIDTH ? MAX_COLUMN_WIDTH : width);
+                        AutoSizeColumn(sheet, j);
                     }
                 }
             }
@@ -724,6 +733,23 @@ namespace CZJ.DNC.Excel
             else
             {
                 return new HSSFWorkbook();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        private static IWorkbook GetWorkbook(Stream stream)
+        {
+            try
+            {
+                return new XSSFWorkbook(stream);
+            }
+            catch
+            {
+                return new HSSFWorkbook(stream);
             }
         }
 
