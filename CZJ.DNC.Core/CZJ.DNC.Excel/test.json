@@ -1,0 +1,40 @@
+{
+  "columnInfoList": [
+    {
+      "header": "车牌号",
+      "field": "plateNo"
+    },
+    {
+      "header": "过车时间",
+      "field": "passingTime"
+    },
+    {
+      "header": "速度",
+      "field": "speed"
+    },
+    {
+      "header": "路口名称",
+      "field": "spottingName"
+    }
+  ],
+  "FileName":"a.xls",
+  "data": [
+    {
+      "plateNo":"鄂AD91U0",
+      "passingTime": "2018-12-24 10:55:23",
+      "speed": 90,
+      "spottingName": "大泉路路口"
+    }
+  ],
+  "remark": "过车数据导出",
+  "colAsSerialize": true,
+  "isExportSelectData":true,
+  "fixColumns": 2,
+  "groupHeader": [
+    {
+      "startColumnName": "plateNo",
+      "numberOfColumns": 2,
+      "titleText": "分组1"
+    }
+  ]
+}
