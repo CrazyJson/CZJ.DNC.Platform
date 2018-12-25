@@ -27,43 +27,6 @@ namespace CZJ.DNC.Excel
         /// </summary>
         private const int rowHeight = 20;
 
-
-        /// <summary>
-        /// 生成EXECL文件，通过读取DataTable和列头映射信息
-        /// </summary>
-        /// <param name="excelInfo">Excel导出信息</param>
-        /// <returns>内存流</returns>
-        public static MemoryStream Export1(ExcelInfo excelInfo)
-        {
-            if (excelInfo == null || excelInfo.Data == null || excelInfo.ColumnInfoList == null)
-            {
-                throw new ArgumentNullException();
-            }
-            IWorkbook workbook = new XSSFWorkbook();
-            var sheet = workbook.CreateSheet();
-            IRow row = sheet.CreateRow(0);
-            ICell cell =null;
-            for (int i=0;i< excelInfo.ColumnInfoList.Count; i++)
-            {
-                cell = row.CreateCell(i);
-                cell.SetCellValue(excelInfo.ColumnInfoList[i].Header);
-            }
-            int iRow = 1;
-            foreach (DataRow dr in excelInfo.Data.Rows)
-            {
-                row = sheet.CreateRow(iRow);
-                for (int i = 0; i < excelInfo.ColumnInfoList.Count; i++)
-                {
-                    cell = row.CreateCell(i);
-                    cell.SetCellValue(dr[excelInfo.ColumnInfoList[i].Field].ToString());
-                }
-                iRow++;
-            }
-            MemoryStream ms = new MemoryStream();
-            workbook.Write(ms);
-            return ms;
-        }
-
         /// <summary>
         /// 生成EXECL文件，通过读取DataTable和列头映射信息
         /// </summary>
@@ -85,9 +48,7 @@ namespace CZJ.DNC.Excel
                 GroupHeader = excelInfo.GroupHeader
             };
             WriteSheetInfo(workbook, sheetInfo);
-            MemoryStream ms = new MemoryStream();
-            workbook.Write(ms);
-            return ms;
+            return workbook.WriteNpoiMemoryStream();
         }
 
         /// <summary>
@@ -115,10 +76,7 @@ namespace CZJ.DNC.Excel
             {
                 WriteSheetInfo(workbook, sheetInfo);
             }
-            MemoryStream ms = new MemoryStream();
-            workbook.Write(ms);
-            ms.Position = 0;
-            return ms;
+            return workbook.WriteNpoiMemoryStream();
         }
 
         /// <summary>
@@ -583,7 +541,6 @@ namespace CZJ.DNC.Excel
         #endregion
 
         #region "私有方法"
-
         /// <summary>
         /// 写入数据到标签页中，自动根据office类型会分多个标签页
         /// </summary>

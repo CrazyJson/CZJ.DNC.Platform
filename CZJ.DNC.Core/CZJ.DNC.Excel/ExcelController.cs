@@ -71,16 +71,11 @@ namespace CZJ.Excel.Controllers
             }
             using (var ms = await info.ExportExeclStream(Request.Headers))
             {
-                byte[] msbyte = ms.GetBuffer();
                 Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
                 Response.Headers.Add("Content-Disposition", string.Format("attachment;filename={0}", Uri.EscapeUriString(info.FileName)));
-                Response.Headers.Add("Content-Length", msbyte.LongLength.ToString());
-
-                Response.ContentType = "application/octet-stream";
-                Response.Body.Write(msbyte, 0, msbyte.Length);
-                Response.Body.Flush();
-                //return File(msbyte, MimeHelper.GetMineType(info.FileName));
-                //return File(msbyte, "application/vnd.ms-excel");
+                Response.ContentType = MimeHelper.GetMineType(info.FileName);
+                Response.ContentLength = ms.Length;
+                ms.CopyTo(Response.Body);
             }                     
         }
 

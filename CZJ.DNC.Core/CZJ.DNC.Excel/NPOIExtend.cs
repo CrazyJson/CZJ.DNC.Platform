@@ -1,5 +1,6 @@
 ﻿using NPOI.SS.UserModel;
 using System;
+using System.IO;
 
 namespace CZJ.DNC.Excel
 {
@@ -8,6 +9,22 @@ namespace CZJ.DNC.Excel
     /// </summary>
     public static class NPOIExtend
     {
+        /// <summary>
+        /// 将workbook写入到Npoi内存流中，解决07Write会关闭流的问题
+        /// </summary>
+        /// <param name="workbook"></param>
+        /// <returns>NpoiMemoryStream</returns>
+        public static NpoiMemoryStream WriteNpoiMemoryStream(this IWorkbook workbook)
+        {
+            NpoiMemoryStream ms = new NpoiMemoryStream();
+            ms.AllowClose = false;
+            workbook.Write(ms);
+            ms.Flush();
+            ms.Seek(0, SeekOrigin.Begin);
+            ms.AllowClose = true;
+            return ms;
+        }
+
         /// <summary>
         /// 冻结表格
         /// </summary>
