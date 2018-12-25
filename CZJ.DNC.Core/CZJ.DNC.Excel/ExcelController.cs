@@ -20,15 +20,19 @@ namespace CZJ.Excel.Controllers
     {
         private readonly IEnumerable<ExcelImport> allImports;
         private readonly IObjectSerializer serializer;
+        private readonly IExportHandler exportHandler;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="allImports"></param>
         /// <param name="serializer"></param>
-        public ExcelController(IEnumerable<ExcelImport> allImports, IObjectSerializer serializer)
+        /// <param name="exportHandler"></param>
+        public ExcelController(IEnumerable<ExcelImport> allImports, IObjectSerializer serializer,
+            IExportHandler exportHandler)
         {
             this.allImports = allImports;
             this.serializer = serializer;
+            this.exportHandler = exportHandler;
         }
 
         /// <summary>
@@ -64,19 +68,15 @@ namespace CZJ.Excel.Controllers
                 {
                     throw new ArgumentNullException(nameof(info.Api));
                 }
-                if (!info.Api.StartsWith(Request.Scheme))
-                {
-                    info.Api = $"{Request.Scheme}://{Request.Host}{info.Api}";
-                }
             }
-            using (var ms = await info.ExportExeclStream(Request.Headers))
+            using (var ms = await exportHandler.GetExportStream(info, Request.Headers))
             {
                 Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
                 Response.Headers.Add("Content-Disposition", string.Format("attachment;filename={0}", Uri.EscapeUriString(info.FileName)));
                 Response.ContentType = MimeHelper.GetMineType(info.FileName);
                 Response.ContentLength = ms.Length;
                 ms.CopyTo(Response.Body);
-            }                     
+            }
         }
 
         /// <summary>

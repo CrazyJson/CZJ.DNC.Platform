@@ -180,6 +180,11 @@ namespace CZJ.DNC.Excel
         /// 合并表头信息
         /// </summary>
         public List<MoreHeader> GroupHeader { get; set; }
+
+        /// <summary>
+        /// 当从接口获取数据时，对数据进行处理的处理器名称
+        /// </summary>
+        public string ApiResultHandler { get; set; } = "default";
     }
 
     /// <summary>
