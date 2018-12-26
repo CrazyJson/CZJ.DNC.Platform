@@ -1,6 +1,7 @@
 ﻿using log4net;
 using log4net.Config;
 using log4net.Repository;
+using log4net.Repository.Hierarchy;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
@@ -37,8 +38,8 @@ namespace CZJ.DNC.Log4net
         public Log4NetProvider(string log4NetConfigFileName)
         {
             loggerRepository = LogManager.CreateRepository(
-                    Assembly.GetExecutingAssembly(),
-                    typeof(log4net.Repository.Hierarchy.Hierarchy));
+                    Assembly.GetEntryAssembly(),
+                    typeof(Hierarchy));
 
             if (!Path.IsPathRooted(log4NetConfigFileName))
             {
@@ -46,7 +47,7 @@ namespace CZJ.DNC.Log4net
             }
             log4NetConfigFileName = Path.GetFullPath(log4NetConfigFileName);
             var configXml = ParseLog4NetConfigFile(log4NetConfigFileName);
-            XmlConfigurator.Configure(this.loggerRepository, configXml.DocumentElement);
+            XmlConfigurator.Configure(loggerRepository, configXml.DocumentElement);
         }
 
         /// <summary>
@@ -96,22 +97,23 @@ namespace CZJ.DNC.Log4net
         /// <returns>The <see cref="XmlElement"/> with the log4net XML element.</returns>
         private XmlDocument ParseLog4NetConfigFile(string filename)
         {
-            using (FileStream fp = File.OpenRead(filename))
+            FileInfo fi = new FileInfo(filename);
+            XmlDocument doc = new XmlDocument();
+            using (StreamReader sr = fi.OpenText())
             {
-                var settings = new XmlReaderSettings
+                doc.Load(sr);
+                XmlNodeList list = doc.SelectNodes("//appender/file");
+                foreach (XmlNode node in list)
                 {
-                    DtdProcessing = DtdProcessing.Prohibit
-                };
-
-                var log4netConfig = new XmlDocument();
-                using (var reader = XmlReader.Create(fp, settings))
-                {
-                    log4netConfig.Load(reader);
+                    var attr = node.Attributes["value"];
+                    if (attr == null)
+                    {
+                        continue;
+                    }
+                    attr.InnerText = AppContext.BaseDirectory + (attr.InnerText.StartsWith("\\") ? attr.InnerText.Substring(1) : attr.InnerText);
                 }
-
-                return log4netConfig;
             }
+            return doc;
         }
-
     }
 }
