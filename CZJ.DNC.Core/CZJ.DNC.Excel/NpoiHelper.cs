@@ -552,25 +552,31 @@ namespace CZJ.DNC.Excel
             {
                 throw new ArgumentNullException();
             }
-            List<ColumnInfo> ColumnInfoList = sheetInfo.ColumnInfoList;
+            List<ColumnInfo> columnInfoList = sheetInfo.ColumnInfoList.Where(e => !string.IsNullOrEmpty(e.Field) && !string.IsNullOrEmpty(e.Header)).ToList();
 
             //每个标签页最多行数
             ExcelVersion version = workbook is XSSFWorkbook ? ExcelVersion.XLSX : ExcelVersion.XLS;
             int sheetRow = GetSheetMaxRow(version);
 
             //表头样式
+            if (sheetInfo.GroupHeader != null && sheetInfo.GroupHeader.Count > 0)
+            {
+                sheetInfo.GroupHeader = sheetInfo.GroupHeader.Where(e =>
+                     columnInfoList.FirstOrDefault(t => t.Field.Equals(e.StartColumnName, StringComparison.CurrentCultureIgnoreCase)) != null).ToList();
+            }
+
             bool headerGroup = sheetInfo.GroupHeader != null && sheetInfo.GroupHeader.Count > 0;
             ICellStyle headerStyle = GetHeaderStyle(workbook, headerGroup);
 
             //寻找列头和DataTable之间映射关系
-            var culumnStyle = GetCellStyle(workbook, sheetInfo.Data, ColumnInfoList);
+            var culumnStyle = GetCellStyle(workbook, sheetInfo.Data, columnInfoList);
 
             var dictGroupMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            List<int> listColumnIndex = new List<int>(ColumnInfoList.Count);
+            List<int> listColumnIndex = new List<int>(columnInfoList.Count);
             if (headerGroup)
             {
                 int index = 0;
-                foreach (var item in ColumnInfoList)
+                foreach (var item in columnInfoList)
                 {
                     if (sheetInfo.GroupHeader.FirstOrDefault(e => e.StartColumnName.Equals(item.Field, StringComparison.OrdinalIgnoreCase)) != null)
                     {
@@ -578,13 +584,18 @@ namespace CZJ.DNC.Excel
                     }
                     index++;
                 }
-                for (int i = 0; i < ColumnInfoList.Count; i++)
+                for (int i = 0; i < columnInfoList.Count; i++)
                 {
                     listColumnIndex.Add(i);
                 }
+                int startCol = 0;
                 foreach (var item in sheetInfo.GroupHeader)
                 {
-                    int startCol = dictGroupMap[item.StartColumnName];
+                    if (string.IsNullOrEmpty(item.StartColumnName) || !dictGroupMap.TryGetValue(item.StartColumnName, out startCol))
+                    {
+                        continue;
+                    }
+                    startCol = dictGroupMap[item.StartColumnName];
                     int lastCol = startCol + item.NumberOfColumns - 1;
                     for (int j = startCol; j <= lastCol; j++)
                     {
@@ -619,7 +630,7 @@ namespace CZJ.DNC.Excel
                 {
                     //输出备注行
                     IRow RemarkRow = sheet.CreateRow(0);
-                    sheet.AddMergedRegion(new CellRangeAddress(0, 0, 0, ColumnInfoList.Count - 1));
+                    sheet.AddMergedRegion(new CellRangeAddress(0, 0, 0, columnInfoList.Count - 1));
                     ICell rcell = RemarkRow.CreateCell(0);
                     ICellStyle remarkStyle = workbook.CreateCellStyle();
                     remarkStyle.WrapText = true;
@@ -655,7 +666,7 @@ namespace CZJ.DNC.Excel
                     IRow row = sheet.CreateRow(iRow);
                     row.HeightInPoints = rowHeight;
                     i = 0;
-                    foreach (var item in ColumnInfoList)
+                    foreach (var item in columnInfoList)
                     {
                         cell = row.CreateCell(i);
                         if (culumnStyle.TryGetValue(item.Field, out cellStyle))
@@ -688,7 +699,7 @@ namespace CZJ.DNC.Excel
                 //自适应列宽度
                 if (total < 5000)
                 {
-                    for (int j = 0; j < ColumnInfoList.Count; j++)
+                    for (int j = 0; j < columnInfoList.Count; j++)
                     {
                         AutoSizeColumn(sheet, j);
                     }
