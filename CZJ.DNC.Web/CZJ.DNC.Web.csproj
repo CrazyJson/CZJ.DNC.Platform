@@ -54,7 +54,10 @@
     <None Update="stop_windowservice.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Template\Excel\设备批量注册.xls">
+    <None Update="Template\Excel\列表数据字典批量添加.xls">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Template\Excel\树形数据字典批量添加.xls">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

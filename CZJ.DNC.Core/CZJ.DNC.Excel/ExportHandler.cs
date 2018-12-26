@@ -18,6 +18,7 @@ namespace CZJ.DNC.Excel
     {
         private readonly IEnumerable<IApiResultHandler> allHandler;
         private readonly IObjectSerializer serializer;
+        private static string[] traceHeaders = new string[] { "Cookie", "Authorization" };
 
         /// <summary>
         /// 
@@ -81,16 +82,24 @@ namespace CZJ.DNC.Excel
                 {
                     Method = method,
                     AddressUrl = info.Api,
-                    Body = info.Filter,
                     ProxyRequest = proxyRequest,
                     RequestSet = (requestMessage) =>
                     {
-                        foreach (var key in headers)
+                        string[] arr = null;
+                        foreach (var key in traceHeaders)
                         {
-                            requestMessage.Headers.TryAddWithoutValidation(key.Key, key.Value.ToArray());
+                            arr = headers[key].ToArray();
+                            if (arr.Length > 0)
+                            {
+                                requestMessage.Headers.TryAddWithoutValidation(key, arr);
+                            }
                         }
                     }
                 };
+                if (method == HttpMethod.Post)
+                {
+                    request.Body = info.Filter;
+                }
                 var r = await request.SendAsync();
                 if (r.IsSuccessStatusCode)
                 {
@@ -105,7 +114,7 @@ namespace CZJ.DNC.Excel
                 }
                 else
                 {
-                    throw new Exception($"{request.Method.ToString()}请求{request.AddressUrl},参数{serializer.Serialize(request.Body)}，服务器响应码{Convert.ToInt32(r.StatusCode)}({r.ReasonPhrase}){r.Content.ReadAsStringAsync().Result}");
+                    throw new Exception($"{request.Method.ToString()}请求{request.AddressUrl},参数{serializer.Serialize(request.Body)}，服务器响应码{Convert.ToInt32(r.StatusCode)}({r.ReasonPhrase}){(await r.Content?.ReadAsStringAsync())}");
                 }
             }
             catch (Exception ex)

@@ -86,7 +86,7 @@ namespace CZJ.Excel.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> DownLoadTemplate(string type)
+        public async Task DownLoadTemplate(string type)
         {
             var handler = GetExcelHandler(type);
             string extraParam = Request.Query["extra"];
@@ -95,25 +95,19 @@ namespace CZJ.Excel.Controllers
                 handler.ExtraParam = extraParam;
             }
             string path = handler.TemplatePath;
-            if (System.IO.File.Exists(path))
-            {
-                try
-                {
-                    MemoryStream ms = new MemoryStream();
-                    await handler.GetExportTemplate(ms);
-                    ms.Position = 0;
-                    Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
-                    Response.Headers.Add("Content-Disposition", string.Format("attachment;filename={0}", Uri.EscapeUriString(Path.GetFileName(path))));
-                    return File(ms, MimeHelper.GetMineType(path));
-                }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-            }
-            else
+            Response.Headers.Add("Access-Control-Expose-Headers", "Content-Disposition");
+            Response.Headers.Add("Content-Disposition", string.Format("attachment;filename={0}", Uri.EscapeUriString(Path.GetFileName(path))));
+            Response.ContentType = MimeHelper.GetMineType(path);
+            if (!System.IO.File.Exists(path))
             {
                 throw new Exception("未找到“" + type.ToString() + "”对应模版文件");
+            }
+            using (var ms = new MemoryStream())
+            {
+                await handler.GetExportTemplate(ms);
+                ms.Position = 0;
+                Response.ContentLength = ms.Length;
+                await ms.CopyToAsync(Response.Body);
             }
         }
 

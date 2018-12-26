@@ -1,0 +1,42 @@
+{
+  "columnInfoList": [
+    {
+      "header": "用户代码",
+      "field": "userCode"
+    },
+    {
+      "header": "用户代码",
+      "field": "userCode"
+    },
+    {
+      "header": "用户代码",
+      "field": "userCode"
+    },
+    {
+      "header": "用户昵称",
+      "field": "userName"
+    },
+    {
+      "header": "创建人",
+      "field": "creator"
+    },
+    {
+      "header": "创建时间",
+      "field": "createdTime"
+    }
+  ],
+  "fileName": "a.xlsx",
+  "api": "http://192.168.0.133:6001/api/SysConfig/Account/FindAll",
+  "type": "get",
+  "isExportSelectData": false,
+  "remark": "我是测试数据",
+  "colAsSerialize": true,
+  "fixColumns": 2,
+  "groupHeader": [
+    {
+      "startColumnName": "userCode2",
+      "numberOfColumns": 2,
+      "titleText": "合并组"
+    }
+  ]
+}
