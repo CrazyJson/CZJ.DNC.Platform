@@ -49,7 +49,8 @@ namespace CZJ.DNC.Log4net
                             foreach (var file in files)
                             {
                                 fi = new FileInfo(file);
-                                if ((now - fi.CreationTime).TotalSeconds > seconds)
+                                if ((now - fi.CreationTime).TotalSeconds > seconds
+                                   || (now - fi.LastWriteTime).TotalSeconds > seconds)
                                 {
                                     try
                                     {

@@ -1,6 +1,7 @@
 ﻿using CZJ.Auditing;
 using CZJ.Common;
 using CZJ.Dependency;
+using CZJ.Common.Serializer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
@@ -30,8 +31,13 @@ namespace System.Net.Http
         });
 
         #region "私有方法"
+
         private static HttpRequestMessage GetHttpRequestMessage(CitmsHttpRequest request, Uri uri)
         {
+            if (request.PathQuery != null)
+            {
+                uri = uri.UsePathQuery(KeyValueSerializer.Serialize(request.PathQuery));
+            }
             var requestMessage = new HttpRequestMessage();
             var requestMethod = request.Method;
             if (requestMethod != HttpMethod.Get &&
@@ -115,6 +121,26 @@ namespace System.Net.Http
         }
         #endregion
 
+
+        /// <summary>
+        /// url添加query或替换segment
+        /// </summary>
+        /// <param name="uri">url</param>
+        /// <param name="keyValues">键值对</param>
+        /// <returns></returns>
+        public static Uri UsePathQuery(this Uri uri, IEnumerable<KeyValuePair<string, string>> keyValues)
+        {
+            var editor = new UriEditor(uri);
+            foreach (var keyValue in keyValues)
+            {
+                if (editor.Replace(keyValue.Key, keyValue.Value) == false)
+                {
+                    editor.AddQuery(keyValue.Key, keyValue.Value);
+                }
+            }
+            return editor.Uri;
+        }
+
         /// <summary>
         /// 发送Http请求
         /// </summary>
@@ -154,9 +180,8 @@ namespace System.Net.Http
                                 if (i == ruleList.Count || result.StatusCode != HttpStatusCode.NotFound)
                                 {
                                     IocManager.Instance.Resolve<ILogger<CitmsHttpRequest>>()
-                                        .LogInformation("代理插件--请求转发到{0}；原始请求Method: {1},Url: {2}; 响应码：{3}",
-                                        uri.ToString(), request.Method.ToString(),
-                                       request.AddressUrl, result.StatusCode);
+                                        .LogInformation("代理插件--请求【{0} {1}】，响应码：{2}",
+                                        request.Method.ToString(), requestMessage.RequestUri.ToString(), result.StatusCode.ToInt());
                                     return result;
                                 }
                             }

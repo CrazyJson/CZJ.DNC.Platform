@@ -55,13 +55,14 @@ namespace CZJ.DNC.Net
         /// 判断服务节点是否激活
         /// </summary>
         /// <param name="hostwithport">主机ip:port</param>
+        /// <param name="millisecondsTimeout">检测超时时间 ms</param>
         /// <returns>bool</returns>
-        public static bool EnsureActiveNode(string hostwithport)
+        public static bool EnsureActiveNode(string hostwithport, int millisecondsTimeout)
         {
             var arr = hostwithport.Split(':');
             string ipAddress = arr[0];
             int port = Convert.ToInt32(arr[1]);
-            return EnsureActiveNode(ipAddress, port);
+            return EnsureActiveNode(ipAddress, port, millisecondsTimeout);
         }
 
         /// <summary>
@@ -69,22 +70,35 @@ namespace CZJ.DNC.Net
         /// </summary>
         /// <param name="host">主机ip</param>
         /// <param name="port">端口</param>
+        /// <param name="millisecondsTimeout">检测超时时间 ms</param>
         /// <returns>bool</returns>
-        public static bool EnsureActiveNode(string host, int port)
+        public static bool EnsureActiveNode(string host, int port, int millisecondsTimeout)
         {
+            bool result = false;
             try
             {
                 using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
                 {
                     socket.Bind(new IPEndPoint(IPAddress.Any, 0));
-                    socket.Connect(new IPEndPoint(IPAddress.Parse(host), port));
+                    var asyncResult = socket.BeginConnect(host, port, null, null);
+                    bool success = asyncResult.AsyncWaitHandle.WaitOne(millisecondsTimeout, true);
+                    if (success)
+                    {
+                        socket.EndConnect(asyncResult);
+                        result = true;
+                    }
+                    else
+                    {
+                        socket.Close();
+                        result = false;
+                    }
                 }
-                return true;
             }
             catch
             {
-                return false;
+                result = false;
             }
+            return result;
         }
 
         /// <summary></summary>   
@@ -115,6 +129,11 @@ namespace CZJ.DNC.Net
             return list;
         }
 
+        /// <summary>
+        /// 检测端口是否被占用
+        /// </summary>
+        /// <param name="port">端口号</param>
+        /// <returns></returns>
         public static bool IsPortInUsed(int port)
         {
             IPGlobalProperties ipGlobalProps = IPGlobalProperties.GetIPGlobalProperties();

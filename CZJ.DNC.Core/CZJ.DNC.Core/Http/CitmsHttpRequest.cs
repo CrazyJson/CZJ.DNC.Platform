@@ -89,6 +89,12 @@ namespace System.Net.Http
         /// </summary>
         public object Body { get; set; }
 
+
+        /// <summary>
+        /// 拼接到Url参数中
+        /// </summary>
+        public object PathQuery { get; set; }
+
         /// <summary>
         /// 配合Body使用
         /// application/json
