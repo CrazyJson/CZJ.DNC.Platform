@@ -2,6 +2,7 @@
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CZJ.DNC.SwaggerExtend
@@ -24,7 +25,8 @@ namespace CZJ.DNC.SwaggerExtend
                 return;
             }
             var parameters = context.ApiDescription.ActionDescriptor.Parameters;
-            var fileParameters = parameters.Where(n => n.ParameterType == typeof(SwaggerFile)).ToList();
+            var fileParameters = parameters.Where(n => n.ParameterType == typeof(SwaggerFile)
+                || n.ParameterType == typeof(SwaggerFile[]) || n.ParameterType == typeof(List<SwaggerFile>)).ToList();
             if (fileParameters.Count <= 0)
             {
                 return;
@@ -43,6 +45,17 @@ namespace CZJ.DNC.SwaggerExtend
                     Required = true,
                     Type = "file"
                 });
+                if (fileParameter.ParameterType != typeof(SwaggerFile))
+                {
+                    operation.Parameters.Add(new NonBodyParameter
+                    {
+                        Name = parameter.Name + "1",
+                        In = "formData",
+                        Description = "上传文件",
+                        Required = true,
+                        Type = "file"
+                    });
+                }
             }
         }
     }

@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
-using Microsoft.Extensions.PlatformAbstractions;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using CZJ.Common.Module;
 using CZJ.Common.Core;
 using CZJ.DNC.SwaggerExtend;
+using System;
 
 namespace CZJ.DNC.Swagger.Module
 {
@@ -56,8 +56,7 @@ namespace CZJ.DNC.Swagger.Module
                 options.OperationFilter<AddAuthTokenHeaderParameter>();
                 options.OperationFilter<CustomHeaderFilter>();
 
-                var basePath = PlatformServices.Default.Application.ApplicationBasePath;
-                string[] files = Directory.GetFiles(basePath, "CZJ.*.xml");
+                string[] files = Directory.GetFiles(AppContext.BaseDirectory, "CZJ.*.xml");
                 foreach (var path in files)
                 {
                     options.IncludeXmlComments(path);
