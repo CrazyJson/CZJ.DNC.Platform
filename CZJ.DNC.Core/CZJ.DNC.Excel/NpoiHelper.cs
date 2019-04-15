@@ -674,18 +674,21 @@ namespace CZJ.DNC.Excel
                             cellValue = sheetInfo.Data.Rows[rowIndex][item.Field];
                             Type columnType = sheetInfo.Data.Columns[item.Field].DataType;
                             cell.SetCellValue(cellValue, columnType);
-                            //cell.CellStyle = cellStyle;
                             if (item.IsLink)
                             {
                                 cellValue = sheetInfo.Data.Rows[rowIndex][item.Field + "Link"];
                                 if (cellValue != DBNull.Value && cellValue != null)
                                 {
-                                    //建一个HSSFHyperlink实体，指明链接类型为URL（这里是枚举，可以根据需求自行更改）  
-                                    HSSFHyperlink link = new HSSFHyperlink(HyperlinkType.Url)
+                                    IHyperlink link = null;
+                                    if (version == ExcelVersion.XLS)
                                     {
-                                        //给HSSFHyperlink的地址赋值 ，默认为该列加上Link
-                                        Address = cellValue.ToString()
-                                    };
+                                        link=  new HSSFHyperlink(HyperlinkType.Unknown);
+                                    }
+                                    else
+                                    {
+                                        link = new XSSFHyperlink(HyperlinkType.Unknown);
+                                    }
+                                    link.Address = cellValue.ToString();
                                     cell.Hyperlink = link;
                                     cell.CellStyle.SetFont(blueFont);
                                 }
