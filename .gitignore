@@ -5,6 +5,7 @@ node_modules
 bin
 obj
 .vs
+.pdb
 .pdb 
 packages 
 *.csproj.user 
